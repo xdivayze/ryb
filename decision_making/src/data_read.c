@@ -1,22 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "data_read.h"
+#include <string.h>
 
-struct DataBuffer
+int databuffer_push(float *val, DataBuffer *databuffer)
 {
-    size_t buffer_capacity; // capacity of the buffer, in number of arrays
-    size_t array_len;       // length of each array in the buffer
-    size_t head;            // index to write
-    size_t tail;            // index to read
-    size_t count;           // buffer current length, it represents the nth array in the buffer not the actual float start in the buffer
-    float *data;            // 2D float array spread into a 1D array where index of any element is found by (index * array_len + array_index)
-};
+    if (databuffer->count == databuffer->buffer_capacity) // return if buffer is full
+        return -1;
 
-int databuffer_push(DataBuffer *databuffer, float *val)
-{
-    //TODO implement push
-    if (databuffer -> count == databuffer -> buffer_capacity) return -1;
+    if (sizeof(*val) / sizeof(float) != databuffer->array_len) // return if array sizes dont match
+        return -2;
 
+    size_t h = databuffer->head;
+
+    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, sizeof(*val));
+
+    h++;
+    if (h == databuffer->buffer_capacity)
+        h = 0; // wrap head to 0 if buffer capacity to avoid getting sigsegv errors
+    databuffer->head = h;
+
+    databuffer->count++;
+    return 0;
 }
 
 int databuffer_pop(DataBuffer *databuffer, float *out_array)
@@ -31,6 +36,7 @@ int databuffer_pop(DataBuffer *databuffer, float *out_array)
 
     databuffer->tail = (databuffer->tail + 1) % databuffer->buffer_capacity;
     databuffer->count--;
+    return 0;
 }
 
 static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)

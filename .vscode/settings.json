@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "data_read.h": "c"
-    }
+        "data_read.h": "c",
+        "libpynq.h": "c"
+    },
+    "makefile.makefilePath": "/home/cavej/repos/ryb/decision_making/Makefile"
 }

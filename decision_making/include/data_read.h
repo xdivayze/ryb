@@ -3,12 +3,20 @@
 
 #include <stddef.h>
 
-typedef struct DataBuffer DataBuffer;
+typedef struct {
+        size_t buffer_capacity; // capacity of the buffer, in number of arrays
+    size_t array_len;       // length of each array in the buffer
+    size_t head;            // index to write, in number of arrays
+    size_t tail;            // index to pop, in number of arrays
+    size_t count;           // buffer current length, it represents the nth array in the buffer not the actual float start in the buffer
+    float *data;            // 2D float array spread into a 1D array where index of any element is found by (index * array_len + array_index)
+} DataBuffer;
 
 DataBuffer* databuffer_create(const size_t buffer_capacity, const size_t array_len) ;
 
 //pushes value array into the buffer, returns status code: 
 // -1 for buffer full
+// -2 for non matching array lengths
 int databuffer_push(float *val, DataBuffer* databuffer ); 
 
 //returns current length in terms of the nth array in the buffer not the nth float
@@ -24,7 +32,7 @@ int databuffer_flush(DataBuffer *databuffer);
 int databuffer_destroy(DataBuffer *databuffer); 
 
 //inline func to switch between array indexing to buffer indexing
-size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index); 
+static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index); 
 
 
-#endif DATA_READ_H
+#endif //DATA_READ_H
