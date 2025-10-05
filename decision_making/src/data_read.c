@@ -30,8 +30,8 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
     while (1)
     {
-
-        uint32_t val[db->array_len]; // array which will be pushed to the buffer
+        //TODO move out of while and use as a new buffer with malloc
+        float val[db->array_len]; // array which will be pushed to the buffer 
 
         for (int i = 0; i < db->array_len; i++)
         { // single thread read data loop through each submodule
@@ -65,7 +65,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
             }
             if (databuffer_push(val, db))
             {
-                int status = pthread_mutex_unlock(mutex); // unlock buffer before exiting
+                status = pthread_mutex_unlock(mutex); // unlock buffer before exiting
                 if (status)
                 {
                     fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
@@ -75,7 +75,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
             }
         }
 
-        int status = pthread_mutex_unlock(mutex);
+        status = pthread_mutex_unlock(mutex);
         if (status)
         {
             fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);

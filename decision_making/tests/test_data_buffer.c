@@ -13,20 +13,32 @@ static void test_push_buffer_multiple(void)
     size_t buffer_size = 25;
     size_t array_len = 2;
     DataBuffer *db = databuffer_create(buffer_size, array_len);
-    for (size_t i = 0; i < buffer_size; i++)
+    for (size_t i = 0; i <= buffer_size; i++) // test circular flow
     {
         float val[] = {2.0f + i, 5.0f + i};
         int status = databuffer_push(val, db);
         TEST_ASSERT_EQUAL_INT(0, status);
-        TEST_ASSERT_EQUAL_size_t(i+1, db->count);
+        TEST_ASSERT_EQUAL_size_t((i + 1) <= buffer_size ? i + 1 : buffer_size, db->count);
         if (i == buffer_size - 1)
         {
             TEST_ASSERT_EQUAL_size_t(0, db->head);
+            TEST_ASSERT_EQUAL_size_t(0, db->tail);
+        }
+        else if (i == buffer_size)
+        {
+            TEST_ASSERT_EQUAL_size_t(1, db->head);
+            TEST_ASSERT_EQUAL_size_t(1, db->tail);
+
+            float* out = malloc(sizeof(float) * array_len);
+            databuffer_pop(db, out);
+
+            float val[] = {3.0f, 6.0f};
+            TEST_ASSERT_EQUAL_FLOAT_ARRAY (val, out, array_len);
         }
         else
             TEST_ASSERT_EQUAL_size_t(i + 1, db->head);
     }
-    TEST_ASSERT_EQUAL_size_t(buffer_size, db->count);
+    TEST_ASSERT_EQUAL_size_t(buffer_size, db->count + 1); //+1 for the popped element
 }
 
 static void test_push_buffer_single(void)

@@ -16,14 +16,7 @@ typedef struct {
 
 DataBuffer* databuffer_create(const size_t buffer_capacity, const size_t array_len) ;
 
-
-//consume the buffer, fast flush it and return pointer to a copy of the old buffer but as a N dimensional array
-//high processing demand O(n^2)
-//TODO implement
-float *databuffer_consume(DataBuffer* databuffer);
-
-//pushes value array into the buffer, returns status code: 
-// -1 for buffer full
+//push data in a circular pattern move head and tail forward when capacity is full
 // no method to check if array lengths are matching so non-matching arrays that are passed will result in unexpected behaavior
 int databuffer_push(float *val, DataBuffer* databuffer ); 
 

@@ -3,32 +3,37 @@
 #include "data_buffer.h"
 #include <string.h>
 
-//inline func to switch between array indexing to buffer indexing
+// inline func to switch between array indexing to buffer indexing
 static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)
 {
     return buffer_index * databuffer->array_len + array_index;
 }
 
-float *databuffer_consume(DataBuffer* databuffer) { 
-    //implement
+float *databuffer_consume(DataBuffer *databuffer)
+{
+    // implement
     return 0;
 }
 
 int databuffer_push(float *val, DataBuffer *databuffer)
 {
-    if (databuffer->count == databuffer->buffer_capacity) // return if buffer is full
-        return -1;
 
     size_t h = databuffer->head;
 
     memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(float));
 
-    h++;
-    if (h == databuffer->buffer_capacity)
-        h = 0; // wrap head to 0 if buffer capacity to avoid getting sigsegv errors
+    h = (h + 1 == databuffer->buffer_capacity) ? 0 : h + 1;
+
+    if (databuffer->count == databuffer->buffer_capacity)
+    {
+        databuffer->tail = (databuffer->tail + 1 == databuffer->buffer_capacity) ? 0 : databuffer->tail + 1;
+    }
+    else
+    {
+        databuffer->count++;
+    }
     databuffer->head = h;
 
-    databuffer->count++;
     return 0;
 }
 
@@ -46,8 +51,6 @@ int databuffer_pop(DataBuffer *databuffer, float *out_array)
     databuffer->count--;
     return 0;
 }
-
-
 
 int databuffer_destroy(DataBuffer *databuffer)
 {
