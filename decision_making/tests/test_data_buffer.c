@@ -34,6 +34,8 @@ static void test_push_buffer_multiple(void)
 
             float val[] = {3.0f, 6.0f};
             TEST_ASSERT_EQUAL_FLOAT_ARRAY (val, out, array_len);
+
+            TEST_ASSERT_EQUAL_size_t(2, db->tail);
         }
         else
             TEST_ASSERT_EQUAL_size_t(i + 1, db->head);

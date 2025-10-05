@@ -33,7 +33,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
         //TODO move out of while and use as a new buffer with malloc
         float val[db->array_len]; // array which will be pushed to the buffer 
 
-        for (int i = 0; i < db->array_len; i++)
+        for (size_t i = 0; i < db->array_len; i++)
         { // single thread read data loop through each submodule
 
             submodule_iic_map *iic_map_curr = iic_map[i];
