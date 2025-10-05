@@ -9,17 +9,19 @@ static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size
     return buffer_index * databuffer->array_len + array_index;
 }
 
+float *databuffer_consume(DataBuffer* databuffer) { 
+    //TODO implement
+    return 0;
+}
+
 int databuffer_push(float *val, DataBuffer *databuffer)
 {
     if (databuffer->count == databuffer->buffer_capacity) // return if buffer is full
         return -1;
 
-    if (sizeof(*val) / sizeof(float) != databuffer->array_len) // return if array sizes dont match
-        return -2;
-
     size_t h = databuffer->head;
 
-    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, sizeof(*val));
+    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(float));
 
     h++;
     if (h == databuffer->buffer_capacity)

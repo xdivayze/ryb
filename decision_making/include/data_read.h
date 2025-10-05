@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+
+//FIFO N dimensional float buffer
 typedef struct {
         size_t buffer_capacity; // capacity of the buffer, in number of arrays
     size_t array_len;       // length of each array in the buffer
@@ -14,9 +16,14 @@ typedef struct {
 
 DataBuffer* databuffer_create(const size_t buffer_capacity, const size_t array_len) ;
 
+
+//consume the buffer, fast flush it and return pointer to a copy of the old buffer but as a N dimensional array
+//high processing demand O(n^2)
+float *databuffer_consume(DataBuffer* databuffer);
+
 //pushes value array into the buffer, returns status code: 
 // -1 for buffer full
-// -2 for non matching array lengths
+// no method to check if array lengths are matching so non-matching arrays that are passed will result in unexpected behaavior
 int databuffer_push(float *val, DataBuffer* databuffer ); 
 
 //returns current length in terms of the nth array in the buffer not the nth float
