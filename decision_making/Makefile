@@ -26,6 +26,7 @@ test: lib
 	$(TEST_BIN)/run_tests
 
 clean:
+	rm -rf $(TEST_BIN)
 	rm -f $(OBJ) $(APP)
 	rm -rf build
 

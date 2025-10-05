@@ -31,8 +31,7 @@ int databuffer_flush(DataBuffer *databuffer);
 //destroy buffer, free memory, returns 0 on success -1 on error
 int databuffer_destroy(DataBuffer *databuffer); 
 
-//inline func to switch between array indexing to buffer indexing
-static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index); 
+
 
 
 #endif //DATA_READ_H

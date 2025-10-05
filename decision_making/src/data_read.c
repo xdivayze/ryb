@@ -3,6 +3,12 @@
 #include "data_read.h"
 #include <string.h>
 
+//inline func to switch between array indexing to buffer indexing
+static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)
+{
+    return buffer_index * databuffer->array_len + array_index;
+}
+
 int databuffer_push(float *val, DataBuffer *databuffer)
 {
     if (databuffer->count == databuffer->buffer_capacity) // return if buffer is full
@@ -29,7 +35,7 @@ int databuffer_pop(DataBuffer *databuffer, float *out_array)
     if (databuffer->count == 0)
         return -1;
 
-    for (int j = 0; j < databuffer->array_len; j++)
+    for (size_t j = 0; j < databuffer->array_len; j++)
     {
         out_array[j] = databuffer->data[idx(databuffer, databuffer->tail, j)];
     }
@@ -39,10 +45,7 @@ int databuffer_pop(DataBuffer *databuffer, float *out_array)
     return 0;
 }
 
-static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)
-{
-    return buffer_index * databuffer->array_len + array_index;
-}
+
 
 int databuffer_destroy(DataBuffer *databuffer)
 {
