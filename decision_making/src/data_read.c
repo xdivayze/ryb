@@ -1,85 +1,87 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "data_read.h"
-#include <string.h>
+#include <stdlib.h>
+#include <libpynq.h>
+#include <stdio.h>
 
-//inline func to switch between array indexing to buffer indexing
-static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)
+submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_register, size_t buffer_array_position, size_t data_size, size_t addr)
 {
-    return buffer_index * databuffer->array_len + array_index;
-}
 
-float *databuffer_consume(DataBuffer* databuffer) { 
-    //TODO implement
-    return 0;
-}
-
-int databuffer_push(float *val, DataBuffer *databuffer)
-{
-    if (databuffer->count == databuffer->buffer_capacity) // return if buffer is full
-        return -1;
-
-    size_t h = databuffer->head;
-
-    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(float));
-
-    h++;
-    if (h == databuffer->buffer_capacity)
-        h = 0; // wrap head to 0 if buffer capacity to avoid getting sigsegv errors
-    databuffer->head = h;
-
-    databuffer->count++;
-    return 0;
-}
-
-int databuffer_pop(DataBuffer *databuffer, float *out_array)
-{
-    if (databuffer->count == 0)
-        return -1;
-
-    for (size_t j = 0; j < databuffer->array_len; j++)
+    if (read_register > PYNQ_MAX_REGISTER)
     {
-        out_array[j] = databuffer->data[idx(databuffer, databuffer->tail, j)];
+        fprintf(stderr, "register exceeding the max register available: %d\n", PYNQ_MAX_REGISTER);
+        return NULL;
     }
 
-    databuffer->tail = (databuffer->tail + 1) % databuffer->buffer_capacity;
-    databuffer->count--;
-    return 0;
-}
-
-
-
-int databuffer_destroy(DataBuffer *databuffer)
-{
-    free(databuffer->data);
-    databuffer->data = NULL;
-    databuffer->buffer_capacity = databuffer->array_len = databuffer->head = databuffer->tail = databuffer->count = 0;
-    return 0;
-}
-
-int databuffer_flush(DataBuffer *databuffer)
-{
-    if (databuffer == NULL)
-        return -1;
-    databuffer->head = databuffer->tail = databuffer->count = 0;
-    return 0;
-}
-
-size_t databuffer_get_current_length(const DataBuffer *databuffer)
-{
-    if (databuffer == NULL)
-        return -1;
-    return databuffer->count;
-}
-
-DataBuffer *databuffer_create(const size_t buffer_capacity, const size_t array_len)
-{
-    DataBuffer *db = malloc(sizeof(DataBuffer));
-    if (!db)
+    submodule_iic_map *map = malloc(sizeof(submodule_iic_map));
+    if (!map)
         return NULL;
-    db->buffer_capacity = buffer_capacity;
-    db->array_len = array_len;
-    db->head = db->tail = db->count = 0;
-    db->data = malloc(sizeof(float) * array_len * buffer_capacity);
-    return db;
+
+    map->buffer_array_position = buffer_array_position;
+    map->data_size = data_size;
+    map->iic_data_pin = iic_data_pin;
+    map->read_register = read_register;
+    map->addr = addr;
+
+    return map;
+}
+
+int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_duration, DataBuffer *db, pthread_mutex_t *mutex, iic_index_t iic)
+{
+
+    while (1)
+    {
+
+        uint32_t val[db->array_len]; // array which will be pushed to the buffer
+
+        for (int i = 0; i < db->array_len; i++)
+        { // single thread read data loop through each submodule
+
+            submodule_iic_map *iic_map_curr = iic_map[i];
+
+            if (db->array_len < iic_map_curr->buffer_array_position)
+            {
+                return -4;
+            }
+
+            uint32_t data; //!fuck endianness
+            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t*) data, iic_map_curr->data_size)) 
+                return -1;
+
+            val[iic_map_curr->buffer_array_position] = data;
+        }
+
+        int status = pthread_mutex_lock(mutex);
+        if (status)
+        {
+            fprintf(stderr, "error occured while locking mutex status code: %d\n", status);
+            return -2;
+        }
+
+        if (databuffer_push(val, db) == -1) // status buffer full
+        {
+            if (databuffer_flush(db))
+            { // flush buffer
+                return -3;
+            }
+            if (databuffer_push(val, db))
+            {
+                int status = pthread_mutex_unlock(mutex); // unlock buffer before exiting
+                if (status)
+                {
+                    fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
+                    return -2;
+                }
+                return -3;
+            }
+        }
+
+        int status = pthread_mutex_unlock(mutex);
+        if (status)
+        {
+            fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
+            return -2;
+        }
+
+        sleep_msec(msec_sleep_duration);
+    }
 }
