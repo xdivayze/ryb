@@ -28,10 +28,9 @@ submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_regis
 int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_duration, DataBuffer *db, pthread_mutex_t *mutex, iic_index_t iic)
 {
 
+    uint8_t *val = malloc(db->array_len); // array which will be pushed to the buffer
     while (1)
     {
-        //TODO move out of while and use as a new buffer with malloc
-        float val[db->array_len]; // array which will be pushed to the buffer 
 
         for (size_t i = 0; i < db->array_len; i++)
         { // single thread read data loop through each submodule
@@ -40,12 +39,17 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
             if (db->array_len < iic_map_curr->buffer_array_position)
             {
+                free(val);
                 return -4;
             }
 
-            uint32_t data; //!fuck endianness
-            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t*) data, iic_map_curr->data_size)) 
+            uint32_t data; //! fuck endianness up to 4 bytes
+            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)data, iic_map_curr->data_size))
+
+            {
+                free(val);
                 return -1;
+            }
 
             val[iic_map_curr->buffer_array_position] = data;
         }
@@ -53,35 +57,22 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
         int status = pthread_mutex_lock(mutex);
         if (status)
         {
+            free(val);
             fprintf(stderr, "error occured while locking mutex status code: %d\n", status);
             return -2;
         }
 
-        if (databuffer_push(val, db) == -1) // status buffer full
-        {
-            if (databuffer_flush(db))
-            { // flush buffer
-                return -3;
-            }
-            if (databuffer_push(val, db))
-            {
-                status = pthread_mutex_unlock(mutex); // unlock buffer before exiting
-                if (status)
-                {
-                    fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
-                    return -2;
-                }
-                return -3;
-            }
-        }
+        databuffer_push(val, db);
 
         status = pthread_mutex_unlock(mutex);
         if (status)
         {
+            free(val);
             fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
             return -2;
         }
 
         sleep_msec(msec_sleep_duration);
     }
+    free(val);
 }

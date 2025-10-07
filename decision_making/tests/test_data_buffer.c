@@ -1,6 +1,7 @@
 #include <unity/unity.h>
 #include <data_buffer.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 void setUp(void)
 {
@@ -15,7 +16,7 @@ static void test_push_buffer_multiple(void)
     DataBuffer *db = databuffer_create(buffer_size, array_len);
     for (size_t i = 0; i <= buffer_size; i++) // test circular flow
     {
-        float val[] = {2.0f + i, 5.0f + i};
+        uint8_t val[] = {2.0f + i, 5.0f + i};
         int status = databuffer_push(val, db);
         TEST_ASSERT_EQUAL_INT(0, status);
         TEST_ASSERT_EQUAL_size_t((i + 1) <= buffer_size ? i + 1 : buffer_size, db->count);
@@ -29,11 +30,11 @@ static void test_push_buffer_multiple(void)
             TEST_ASSERT_EQUAL_size_t(1, db->head);
             TEST_ASSERT_EQUAL_size_t(1, db->tail);
 
-            float* out = malloc(sizeof(float) * array_len);
+            uint8_t* out = malloc(sizeof(uint8_t) * array_len);
             databuffer_pop(db, out);
 
-            float val[] = {3.0f, 6.0f};
-            TEST_ASSERT_EQUAL_FLOAT_ARRAY (val, out, array_len);
+            uint8_t val[] = {3.0f, 6.0f};
+            TEST_ASSERT_EQUAL_UINT8_ARRAY (val, out, array_len);
 
             TEST_ASSERT_EQUAL_size_t(2, db->tail);
         }
@@ -49,15 +50,15 @@ static void test_push_buffer_single(void)
     size_t array_len = 2;
     DataBuffer *db = databuffer_create(buffer_size, array_len);
 
-    float val[] = {2.0f, 5.0f};
+    uint8_t val[] = {2.0f, 5.0f};
     int status = databuffer_push(val, db);
     TEST_ASSERT_EQUAL_INT(0, status);
     TEST_ASSERT_EQUAL_size_t(1, db->count);
     TEST_ASSERT_EQUAL_size_t(1, db->head);
 
-    float *out_array = malloc((sizeof(float) * array_len));
+    uint8_t *out_array = malloc((sizeof(uint8_t) * array_len));
     databuffer_pop(db, out_array);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(val, out_array, array_len);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(val, out_array, array_len);
 
     free(out_array);
     TEST_ASSERT_EQUAL_INT(0, databuffer_destroy(db));

@@ -3,7 +3,9 @@
 #include <data_buffer.h>
 
 #define GLOBAL_DATA_BUFFER_CAPACITY 10
-#define GLOBAL_DATA_BUFFER_ARRAY_LENGTH 2
+#define GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH 2
+
+#define GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH 2
 
 #define IIC_SCL_PIN IO_PMODA3
 #define IIC_SDA_PIN IO_PMODA4
@@ -14,6 +16,9 @@
 #define CRYING_IIC_ADDRESS 0x47
 #define CRYING_IIC_DATA_REGISTER 1
 
+#define PWM_PERIOD_CLOCK_TICKS 100000
+
+#define MSEC_PWM_SIGNAL_DURATION 2
 
 int main() {
     pynq_init();
@@ -22,17 +27,17 @@ int main() {
     switchbox_set_pin(IIC_SCL_PIN, SWB_IIC0_SCL);
     switchbox_set_pin(IIC_SDA_PIN, SWB_IIC0_SDA);
 
-    DataBuffer* databuffer = databuffer_create(GLOBAL_DATA_BUFFER_CAPACITY, GLOBAL_DATA_BUFFER_ARRAY_LENGTH);
-    
-    pthread_mutex_t *buffer_mutex;
-    pthread_mutex_init(buffer_mutex, NULL);
+    DataBuffer* databuffer_in = databuffer_create(GLOBAL_DATA_BUFFER_CAPACITY, GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH);
+    pthread_mutex_t *buffer_in_mutex;
+    pthread_mutex_init(buffer_in_mutex, NULL);
+
+    DataBuffer* databuffer_out = databuffer_create(GLOBAL_DATA_BUFFER_CAPACITY, GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH);
+    pthread_mutex_t *buffer_out_mutex;
+    pthread_mutex_init(buffer_out_mutex, NULL);
+
+
 
     //TODO lock buffer while reading as well to avoid flushing
-    
-
-
-
-
 
 
     iic_destroy(IIC0);

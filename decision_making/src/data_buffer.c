@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "data_buffer.h"
 #include <string.h>
+#include <stdint.h>
 
 // inline func to switch between array indexing to buffer indexing
 static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size_t array_index)
@@ -9,18 +10,18 @@ static inline size_t idx(const DataBuffer *databuffer, size_t buffer_index, size
     return buffer_index * databuffer->array_len + array_index;
 }
 
-float *databuffer_consume(DataBuffer *databuffer)
+uint8_t *databuffer_consume(DataBuffer *databuffer)
 {
     // implement
     return 0;
 }
 
-int databuffer_push(float *val, DataBuffer *databuffer)
+int databuffer_push(uint8_t *val, DataBuffer *databuffer)
 {
 
     size_t h = databuffer->head;
 
-    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(float));
+    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(uint8_t));
 
     h = (h + 1 == databuffer->buffer_capacity) ? 0 : h + 1;
 
@@ -37,7 +38,7 @@ int databuffer_push(float *val, DataBuffer *databuffer)
     return 0;
 }
 
-int databuffer_pop(DataBuffer *databuffer, float *out_array)
+int databuffer_pop(DataBuffer *databuffer, uint8_t *out_array)
 {
     if (databuffer->count == 0)
         return -1;
@@ -83,6 +84,6 @@ DataBuffer *databuffer_create(const size_t buffer_capacity, const size_t array_l
     db->buffer_capacity = buffer_capacity;
     db->array_len = array_len;
     db->head = db->tail = db->count = 0;
-    db->data = malloc(sizeof(float) * array_len * buffer_capacity);
+    db->data = malloc(sizeof(uint8_t) * array_len * buffer_capacity);
     return db;
 }
