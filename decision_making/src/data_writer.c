@@ -18,7 +18,7 @@ int pwm_multiplex_writer(size_t msec_signal_duration, uint32_t ticks_period, uin
     while (1)
     {
         pthread_mutex_lock(mutex);
-        databuffer_pop(buffer, val);
+        databuffer_pop(buffer, val); //! this might return old values or (0,0)
         pthread_mutex_unlock(mutex);
 
         pwm_set_duty_cycle(pwm_chan, ticks_duty_cycle_calculator(sync_signal, ticks_period));
