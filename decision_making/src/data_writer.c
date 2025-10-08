@@ -8,6 +8,10 @@ static inline uint32_t ticks_duty_cycle_calculator(uint8_t data, uint32_t ticks_
     return (ticks_period * data) / UINT8_MAX;
 }
 
+int pwm_multiplex_writer_fromargs(pwm_multiplex_writer_args *args){
+    return pwm_multiplex_writer(args->msec_signal_duration, args->ticks_period, args->sync_signal, args->buffer, args->mutex, args->pwm_chan);
+}
+
 int pwm_multiplex_writer(size_t msec_signal_duration, uint32_t ticks_period, uint8_t sync_signal, DataBuffer *buffer, pthread_mutex_t *mutex, int pwm_chan)
 {
     uint8_t *val = malloc(sizeof(uint8_t) * buffer->array_len);

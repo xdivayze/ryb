@@ -18,12 +18,23 @@ typedef struct
 
 } submodule_iic_map;
 
+typedef struct
+{
+    submodule_iic_map **iic_map;
+    size_t msec_sleep_duration;
+    DataBuffer *db;
+    pthread_mutex_t *mutex;
+    iic_index_t iic;
+} read_from_iic_to_databuffer_args;
+
 submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_register, size_t buffer_array_position, size_t data_size, size_t addr);
 
+int call_read_from_iic_to_databuffer_fromargs(read_from_iic_to_databuffer_args *args);
+
 // constantly read from iic and write to respective buffer positions
-//sending iic_map array longer than buffer's array will result in a sigsegv
-//initializes a while loop
-//return 0 on success
+// sending iic_map array longer than buffer's array will result in a sigsegv
+// initializes a while loop
+// return 0 on success
 //-1 on error while reading register
 //-2 on mutex operation fail
 //-3 on buffer fail

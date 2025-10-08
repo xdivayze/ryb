@@ -3,6 +3,10 @@
 #include <libpynq.h>
 #include <stdio.h>
 
+int call_read_from_iic_to_databuffer_fromargs(read_from_iic_to_databuffer_args* args) {
+    return read_from_iic_to_databuffer(args->iic_map, args->msec_sleep_duration, args->db, args->mutex, args->iic );
+}
+
 submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_register, size_t buffer_array_position, size_t data_size, size_t addr)
 {
 
