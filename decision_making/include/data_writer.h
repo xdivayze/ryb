@@ -18,7 +18,7 @@ typedef struct
     int pwm_chan;
 } pwm_multiplex_writer_args;
 
-int pwm_multiplex_writer_fromargs(pwm_multiplex_writer_args *args);
+void* pwm_multiplex_writer_fromargs(void *args);
 
 // Duty encoded byte per frame
 // Duty Cycle(%) * 255(0b11111111) = data

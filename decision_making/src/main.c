@@ -66,8 +66,8 @@ int main()
     reader_in_args->msec_sleep_duration = MSEC_IN_READ_SLEEP_DURATION;
     reader_in_args->mutex = buffer_in_mutex;
 
-    pthread_t *reader;
-    pthread_create(reader, NULL, call_read_from_iic_to_databuffer_fromargs, reader_in_args);
+    pthread_t reader;
+    pthread_create(&reader, NULL, call_read_from_iic_to_databuffer_fromargs, reader_in_args);
 
     // INITIALIZE DATA PROCESSING THREAD
 
@@ -78,8 +78,8 @@ int main()
     processor_args->mutex_out_buffer = buffer_out_mutex;
     processor_args->msec_sleep = PROCESSOR_SLEEP_DURATION;
 
-    pthread_t *processor;
-    pthread_create(processor, NULL, call_data_process_fromargs, processor_args);
+    pthread_t processor;
+    pthread_create(&processor, NULL, call_data_process_fromargs, processor_args);
 
     // INITIALIZE OUTPUT BUFFER
     switchbox_set_pin(PWM_CHAN, PWM_PIN);
@@ -95,8 +95,8 @@ int main()
     writer_out_args->sync_signal = PWM_SYNC_SIGNAL;
     writer_out_args->ticks_period = PWM_PERIOD_CLOCK_TICKS;
 
-    pthread_t *writer;
-    pthread_create(writer, NULL, pwm_multiplex_writer_fromargs, writer_out_args);
+    pthread_t writer;
+    pthread_create(&writer, NULL, pwm_multiplex_writer_fromargs, writer_out_args);
 
     pthread_join(reader, NULL);
     pthread_join(writer, NULL);

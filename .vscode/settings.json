@@ -1,7 +1,17 @@
 {
     "files.associations": {
         "data_read.h": "c",
-        "libpynq.h": "c"
+        "libpynq.h": "c",
+        "util.h": "c",
+        "unistd.h": "c",
+        "arm_shared_memory_system.h": "c",
+        "iic.h": "c",
+        "log.h": "c",
+        "platform.h": "c",
+        "xiic_l.h": "c",
+        "stdio.h": "c",
+        "stdint.h": "c",
+        "fcntl.h": "c"
     },
     "makefile.makefilePath": "/home/cavej/repos/ryb/decision_making/Makefile"
 }

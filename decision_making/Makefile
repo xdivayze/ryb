@@ -1,33 +1,49 @@
-CC := gcc
-CFLAGS := -std=c17 -Wall -Wextra -O2 -Iinclude -Itests -I../library
-LDFLAGS := 
+TARGET := bin/app
 
-SRC_DIRS := src ../library
-SRC := $(foreach dir, $(SRC_DIRS), $(wildcard src/*.c))
-SRC := $(filter-out src/main.c, $(SRC))
-OBJ := $(SRC:.c=.o)
+CC        := gcc
+CSTD      := -std=c17
+WARN      := -Wall -Wextra
+CFLAGS := -D_GNU_SOURCE
 
-TEST_SRC := tests/test_data_buffer.c tests/unity/unity.c 
-TEST_BIN := bin/tests
+OPT       := -O2
+DBG       := -g
 
-APP := app.a
+LDFLAGS   :=
+LDLIBS    := -lm
 
-.PHONY: all lib test clean
+# === Layout ===
+SRC_DIRS  := src ../library
+INC_DIRS  := include ../library
 
-all:lib
+# Collect all .c files from SRC_DIRS (non-recursive)
+SRCS      := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 
-lib: $(OBJ)
-	ar rcs $(APP) $(OBJ)
+# Object files live under build/obj/<original-path>.o
+OBJS      := $(patsubst %.c,build/obj/%.o,$(SRCS))
+DEPS      := $(OBJS:.o=.d)
 
-test: lib
-	@mkdir -p $(TEST_BIN)
-	$(CC) $(CFLAGS) $(TEST_SRC) $(APP) -o $(TEST_BIN)/run_tests $(LDFLAGS)
-	@echo "Running unit tests..."
-	$(TEST_BIN)/run_tests
+# === Default target ===
+.PHONY: all
+all: $(TARGET)
 
-clean:
-	rm -rf $(TEST_BIN)
-	rm -f $(OBJ) $(APP)
-	rm -rf build
+# Link step
+$(TARGET): $(OBJS)
+	@mkdir -p $(dir $@)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
 
-	
+build/obj/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CSTD) $(WARN) $(OPT) $(DBG) $(CFLAGS) -MMD -MP \
+	-D_XOPEN_SOURCE=500 \
+		$(addprefix -I,$(INC_DIRS)) \
+		-c $< -o $@
+
+# Auto-include generated dependency files
+-include $(DEPS)
+
+
+.PHONY: clean
+clean: 
+	rm -rf build/obj
+	rm -f $(TARGET)
+	rm -f $(DEPS)

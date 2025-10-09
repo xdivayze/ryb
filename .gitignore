@@ -1,3 +1,4 @@
 /**/*.a
-decision_making/bin/tests
+decision_making/bin/
+decision_making/build/
 /**/*.o

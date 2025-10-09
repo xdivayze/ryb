@@ -6,9 +6,11 @@
 #include <libpynq.h>
 #include <data_processor.h>
 
-int call_data_process_fromargs(data_process_args *args)
+void* call_data_process_fromargs(void *args)
 {
-    return data_process(args->mutex_in_buffer, args->mutex_out_buffer, args->db_in, args->db_out, args->msec_sleep);
+    data_process_args *dp_args = (data_process_args*) args;
+
+    return (void *) data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep);
 }
 
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out, size_t msec_sleep)
