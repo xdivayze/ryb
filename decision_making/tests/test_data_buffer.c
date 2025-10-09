@@ -1,4 +1,4 @@
-#include <unity/unity.h>
+#include <unity.h>
 #include <data_buffer.h>
 #include <stdlib.h>
 #include <stdint.h>
