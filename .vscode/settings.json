@@ -11,7 +11,8 @@
         "xiic_l.h": "c",
         "stdio.h": "c",
         "stdint.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "stdlib.h": "c"
     },
     "makefile.makefilePath": "/home/cavej/repos/ryb/decision_making/Makefile"
 }

@@ -9,7 +9,7 @@ void setUp(void)
 
 void tearDown(void) {}
 
-static void test_push_buffer_multiple(void)
+ void test_push_buffer_multiple(void)
 {
     size_t buffer_size = 25;
     size_t array_len = 2;
@@ -44,7 +44,7 @@ static void test_push_buffer_multiple(void)
     TEST_ASSERT_EQUAL_size_t(buffer_size, db->count + 1); //+1 for the popped element
 }
 
-static void test_push_buffer_single(void)
+ void test_push_buffer_single(void)
 {
     size_t buffer_size = 25;
     size_t array_len = 2;
@@ -64,7 +64,7 @@ static void test_push_buffer_single(void)
     TEST_ASSERT_EQUAL_INT(0, databuffer_destroy(db));
 }
 
-static void test_create_buffer(void)
+ void test_create_buffer(void)
 {
     size_t buffer_size = 25;
     size_t array_len = 2;
@@ -79,11 +79,3 @@ static void test_create_buffer(void)
     TEST_ASSERT_EQUAL_INT(0, databuffer_destroy(db));
 }
 
-int main(void)
-{
-    UNITY_BEGIN();
-    RUN_TEST(test_create_buffer);
-    RUN_TEST(test_push_buffer_single);
-    RUN_TEST(test_push_buffer_multiple);
-    return UNITY_END();
-}
