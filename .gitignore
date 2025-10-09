@@ -2,3 +2,5 @@
 decision_making/bin/
 decision_making/build/
 /**/*.o
+data_sender/bin
+data_sender/build

@@ -11,18 +11,15 @@ DBG       := -g
 LDFLAGS   :=
 LDLIBS    := -lm
 
-# === Layout ===
 SRC_DIRS  := src ../library
 INC_DIRS  := include ../library
 
-# Collect all .c files from SRC_DIRS (non-recursive)
 SRCS      := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 
-# Object files live under build/obj/<original-path>.o
 OBJS      := $(patsubst %.c,build/obj/%.o,$(SRCS))
 DEPS      := $(OBJS:.o=.d)
 
-# === Default target ===
+
 .PHONY: all
 all: $(TARGET)
 
