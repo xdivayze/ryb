@@ -21,6 +21,4 @@ void* i2c_writer(void * args) {
         regs[0] = casted_args->data_to_send; //only up to 4 bytes for testing purposes
         sleep_msec(10);
     }
-
-    iic_destroy(casted_args->IIC_INDEX);
 }

@@ -5,7 +5,10 @@
 
 static volatile int keep_running = 1;
 
-void stop_i2c_reader(void){
+#define MSEC_SLEEP_ON_TIMEOUT 250
+
+void stop_i2c_reader(void)
+{
     keep_running = 0;
 }
 
@@ -59,6 +62,8 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
     while (keep_running)
     {
 
+        int read_status = 0;
+
         for (size_t i = 0; i < db->array_len; i++)
         { // single thread read data loop through each submodule
 
@@ -70,15 +75,25 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
                 return -4;
             }
 
-            uint32_t data[32] = {0};
-            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)data, sizeof(data) / sizeof(data[0])))
+            uint32_t data = 0;
+            size_t data_size = sizeof(data);
+            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)&data, data_size))
 
             {
-                free(val);
-                return -1;
-            }
 
-            val[iic_map_curr->buffer_array_position] = (uint8_t)(data[0] & 0xFF);
+                read_status = -1;
+            }
+            else
+            {
+                // fprintf(stdout, "read: 0x%08X\n", data);
+                val[iic_map_curr->buffer_array_position] = (uint8_t)(data & 0xFF);
+            }
+        }
+
+        if (read_status != 0)
+        {
+            sleep_msec(MSEC_SLEEP_ON_TIMEOUT); // wait for i2c bus reset
+            continue;
         }
 
         int status = pthread_mutex_lock(mutex);

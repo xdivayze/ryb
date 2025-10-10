@@ -45,7 +45,8 @@ int databuffer_pop(DataBuffer *databuffer, uint8_t *out_array)
 
     for (size_t j = 0; j < databuffer->array_len; j++)
     {
-        out_array[j] = databuffer->data[idx(databuffer, databuffer->tail, j)];
+        size_t access_index = idx(databuffer, databuffer->tail, j);
+        out_array[j] = databuffer->data[access_index];
     }
 
     databuffer->tail = (databuffer->tail + 1) % databuffer->buffer_capacity;

@@ -1,7 +1,22 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": []
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach via gdbserver (sudo)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/decision_making/bin/app",
+      "cwd": "${workspaceFolder}/decision_making",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "127.0.0.1:2345",
+      "externalConsole": false,
+      "console": "integratedTerminal",
+      "miDebuggerArgs": "--nx",
+      "setupCommands": [
+        { "text": "set pagination off" },
+        { "text": "set auto-load off" }
+      ],
+    }
+  ]
 }
