@@ -3,11 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-void setUp(void)
-{
-}
 
-void tearDown(void) {}
 
  void test_push_buffer_multiple(void)
 {

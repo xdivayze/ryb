@@ -3,9 +3,16 @@
 #include <libpynq.h>
 #include <stdio.h>
 
-void* call_read_from_iic_to_databuffer_fromargs(void* args) {
-    read_from_iic_to_databuffer_args* reader_args = (read_from_iic_to_databuffer_args*) args;
-    return (void *) read_from_iic_to_databuffer(reader_args->iic_map, reader_args->msec_sleep_duration, reader_args->db, reader_args->mutex, reader_args->iic );
+static volatile int keep_running = 1;
+
+void stop_i2c_reader(void){
+    keep_running = 0;
+}
+
+void *call_read_from_iic_to_databuffer_fromargs(void *args)
+{
+    read_from_iic_to_databuffer_args *reader_args = (read_from_iic_to_databuffer_args *)args;
+    return (void *)read_from_iic_to_databuffer(reader_args->iic_map, reader_args->msec_sleep_duration, reader_args->db, reader_args->mutex, reader_args->iic);
 }
 
 submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_register, size_t buffer_array_position, size_t data_size, size_t addr)
@@ -32,9 +39,24 @@ submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_regis
 
 int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_duration, DataBuffer *db, pthread_mutex_t *mutex, iic_index_t iic)
 {
+    for (int i = 0; i < db->array_len; i++)
+    {
+        submodule_iic_map *iic_map_curr = iic_map[i];
+
+        uint8_t d = 0;
+        if (iic_write_register(iic, iic_map_curr->addr, 0, &d, 1) == 0)
+        {
+            fprintf(stdout, "ACK Successful on addr: %d\n", iic_map_curr->addr);
+        }
+        else
+        {
+            fprintf(stderr, "ACK Failed on addr: %d\n", iic_map_curr->addr);
+            return -4;
+        }
+    }
 
     uint8_t *val = malloc(db->array_len); // array which will be pushed to the buffer
-    while (1)
+    while (keep_running)
     {
 
         for (size_t i = 0; i < db->array_len; i++)
@@ -48,15 +70,15 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
                 return -4;
             }
 
-            uint32_t data; //! fuck endianness up to 4 bytes
-            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)data, iic_map_curr->data_size))
+            uint32_t data[32] = {0};
+            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)data, sizeof(data) / sizeof(data[0])))
 
             {
                 free(val);
                 return -1;
             }
 
-            val[iic_map_curr->buffer_array_position] = data;
+            val[iic_map_curr->buffer_array_position] = (uint8_t)(data[0] & 0xFF);
         }
 
         int status = pthread_mutex_lock(mutex);

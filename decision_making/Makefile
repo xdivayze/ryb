@@ -53,9 +53,11 @@ clean:
 TEST_DIR := tests
 UNITY_DIR := $(TEST_DIR)/unity
 
+UTILS_DIR := $(TEST_DIR)/utils
+
 TEST_RUNNER := $(TEST_DIR)/test_runner.c
 TEST_CASES  := $(filter-out $(TEST_RUNNER), $(wildcard $(TEST_DIR)/*.c))
-TEST_SRC    := $(TEST_RUNNER) $(TEST_CASES) $(UNITY_DIR)/unity.c
+TEST_SRC    := $(TEST_RUNNER) $(TEST_CASES) $(UNITY_DIR)/unity.c $(UTILS_DIR)/utils.c
 TEST_BIN := bin/tests/run_tests
 
 
@@ -63,7 +65,6 @@ TEST_BIN := bin/tests/run_tests
 test: all
 	@mkdir -p $(dir $(TEST_BIN))
 	$(CC) $(CSTD) $(WARN) $(OPT) $(DBG) $(CFLAGS) \
-		$(addprefix -I, $(INC_DIRS)) -I$(UNITY_DIR) \
+		$(addprefix -I, $(INC_DIRS)) -I$(UNITY_DIR) -I$(UTILS_DIR) \
 		$(TEST_SRC) $(OBJS) -o $(TEST_BIN) $(LDFLAGS) $(LDLIBS)
-	@$(TEST_BIN)
 

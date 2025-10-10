@@ -12,7 +12,9 @@
         "stdio.h": "c",
         "stdint.h": "c",
         "fcntl.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "utils.h": "c",
+        "pthread.h": "c"
     },
     "makefile.makefilePath": "/home/cavej/repos/ryb/decision_making/Makefile"
 }
