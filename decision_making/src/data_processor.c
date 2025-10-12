@@ -4,13 +4,18 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <libpynq.h>
-#include <data_processor.h>
+#include "data_processor.h"
 
-#define HEARTBEAT_DISPLAY_TEXT "Heartbeat Input"
-#define CRYING_DISPLAY_TEXT "Crying Input"
+#define HEARTBEAT_DISPLAY_TEXT "IN1"
+#define CRYING_DISPLAY_TEXT "IN2"
 
-#define OUT_FREQ_TEXT "Frequency Output"
-#define OUT_AMPL_TEXT "Amplitude Output"
+#define OUT_FREQ_TEXT "OUT1"
+#define OUT_AMPL_TEXT "OUT2"
+
+static void int_as_string(uint8_t num, char *buf)
+{
+    sprintf(buf, "%d", num);
+}
 
 void *call_data_process_fromargs(void *args)
 {
@@ -30,9 +35,9 @@ int display_draw_default(display_t *display, stylistics *styling)
     displayDrawString(display, styling->fx, styling->x_inner_offset + DISPLAY_WIDTH / 2, styling->y_outer_offset,
                       CRYING_DISPLAY_TEXT, RGB_BLACK);
 
-    displayDrawString(display, styling->fx, styling->x_outer_offset, DISPLAY_HEIGHT / 2 + styling->y_inner_offset,
+    displayDrawString(display, styling->fx, styling->x_outer_offset, DISPLAY_HEIGHT / 2 + styling->y_outer_offset,
                       OUT_AMPL_TEXT, RGB_BLACK);
-    displayDrawString(display, styling->fx, styling->x_inner_offset + DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 + styling->y_inner_offset,
+    displayDrawString(display, styling->fx, styling->x_inner_offset + DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 + styling->y_outer_offset,
                       OUT_FREQ_TEXT, RGB_BLACK);
 
     return 0;
@@ -55,7 +60,6 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     uint8_t *val = malloc(sizeof(uint8_t) * 2);
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
-    
 
     while (1)
     {
@@ -63,12 +67,21 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         databuffer_pop(db_in, val);
         pthread_mutex_unlock(mutex_in_buffer);
 
-        uint8_t* vals_out = {val[0] >> 1, val[0] >> 1 };
+        uint8_t vals_out[2] = {val[0] >> 1, val[0] >> 1};
 
         displayFillScreen(display, RGB_WHITE);
         display_draw_default(display, styling);
 
-        display_string_on_display(display, val[0], val[1], vals_out[1], vals_out[0], styling);
+        char s0[4];
+        char s1[4];
+        char s2[4];
+        char s3[4];
+        int_as_string(val[0], s0);
+        int_as_string(val[1], s1);
+        int_as_string(vals_out[1], s2);
+        int_as_string(vals_out[0], s3);
+        display_string_on_display(display, s0, s1,
+                                  s2, s3, styling);
 
         pthread_mutex_lock(mutex_out_buffer);
         databuffer_push(vals_out, db_out);

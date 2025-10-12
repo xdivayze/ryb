@@ -9,6 +9,16 @@
 
 typedef struct
 {
+    uint16_t y_inner_offset;
+    uint16_t x_inner_offset;
+    uint16_t x_outer_offset;
+    uint16_t y_outer_offset;
+    uint16_t line_width;
+    FontxFile *fx;
+} stylistics;
+
+typedef struct
+{
     pthread_mutex_t *mutex_in_buffer;
     pthread_mutex_t *mutex_out_buffer;
     DataBuffer *db_in;
@@ -17,16 +27,6 @@ typedef struct
     display_t *display;
     stylistics *styling;
 } data_process_args;
-
-typedef struct
-{
-    uint16_t y_inner_offset;
-    uint16_t x_inner_offset;
-    uint16_t x_outer_offset;
-    uint16_t y_outer_offset;
-    uint16_t line_width;
-    FontxFile *fx;
-} stylistics;
 
 void *call_data_process_fromargs(void *args);
 
