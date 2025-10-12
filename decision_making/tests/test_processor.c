@@ -15,11 +15,9 @@ void test_processor(void)
     DataBuffer *db_out = databuffer_create(10, 2);
 
     uint8_t full_array[2] = {5,5};
-    for(int i = 0; i<20; i++) {
+    for(int i = 0; i<10; i++) {
         databuffer_push(full_array, db_in);
     }
-    
-    db_in->data = full_array;
 
     pthread_mutex_t mutex_in;
     pthread_mutex_init(&mutex_in, NULL);
@@ -34,8 +32,8 @@ void test_processor(void)
     styling->line_width = 5;
     styling->x_inner_offset = 50;
     styling->x_outer_offset = 20;
-    styling->y_inner_offset = 20;
-    styling->y_outer_offset = 10;
+    styling->y_inner_offset = 50;
+    styling->y_outer_offset = 20;
     styling->fx = fx16G;
 
     data_process_args *p_args = malloc(sizeof(data_process_args));

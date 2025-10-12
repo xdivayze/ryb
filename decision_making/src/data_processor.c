@@ -67,7 +67,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         databuffer_pop(db_in, val);
         pthread_mutex_unlock(mutex_in_buffer);
 
-        uint8_t vals_out[2] = {val[0] >> 1, val[0] >> 1};
+        uint8_t vals_out[2] = {val[0] >> 1, val[1] >> 1};
 
         displayFillScreen(display, RGB_WHITE);
         display_draw_default(display, styling);
