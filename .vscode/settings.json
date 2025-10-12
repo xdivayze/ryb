@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "libpynq.h": "c"
+        "libpynq.h": "c",
+        "data_buffer.h": "c"
     },
     "makefile.makefilePath": "${workspaceFolder}/decision_making/Makefile"
 }
