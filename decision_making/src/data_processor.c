@@ -12,6 +12,13 @@
 #define OUT_FREQ_TEXT "OUT1"
 #define OUT_AMPL_TEXT "OUT2"
 
+static volatile int keep_running = 1;
+
+void stop_processing(void)
+{
+    keep_running = 0;
+}
+
 static void int_as_string(uint8_t num, char *buf)
 {
     sprintf(buf, "%d", num);
@@ -61,7 +68,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
 
-    while (1)
+    while (keep_running)
     {
         pthread_mutex_lock(mutex_in_buffer);
         databuffer_pop(db_in, val);
@@ -89,7 +96,8 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         sleep_msec(msec_sleep);
     }
-
+    displayFillScreen(display, RGB_WHITE);
+    fprintf(stdout, "Closed display\n");
     free(val);
     return 0;
 }

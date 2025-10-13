@@ -49,8 +49,10 @@ void test_processor(void)
     pthread_create(&processor_thread, NULL, call_data_process_fromargs, p_args);
 
     sleep_msec(7000);
+    stop_processing();
 
     // pthread_join(processor_thread, NULL);
+    sleep_msec(250);
 
     display_destroy(&display);
     pynq_destroy();

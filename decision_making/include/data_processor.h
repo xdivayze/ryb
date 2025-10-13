@@ -7,6 +7,8 @@
 
 #define SINGLE_SIDE_BUFFER_CAPACITY 10
 
+void stop_processing(void);
+
 typedef struct
 {
     uint16_t y_inner_offset;
