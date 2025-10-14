@@ -47,6 +47,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
         submodule_iic_map *iic_map_curr = iic_map[i];
 
         uint8_t d = 0;
+        sleep_msec(250);
         if (iic_write_register(iic, iic_map_curr->addr, 0, &d, 1) == 0)
         {
             fprintf(stdout, "ACK Successful on addr: %d\n", iic_map_curr->addr);

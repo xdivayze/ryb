@@ -1,14 +1,16 @@
 #include <libpynq.h>
 #include <stdint.h>
 
-#define IIC_SCL_PIN IO_PMODA3
-#define IIC_SDA_PIN IO_PMODA4
+#define IIC_SCL_PIN IO_PMODA1
+#define IIC_SDA_PIN IO_PMODA2
 #define IIC_INDEX IIC0
 
 #define HEARTBEAT_IIC_ADDRESS 0x60
-#define HEARTBEAT_IIC_DATA_REGISTER 1
+#define HEARTBEAT_IIC_DATA_REGISTER 0
 #define HEARTBEAT_BUFFER_POS 0
 #define BYTES_HEARTBEAT_DATA_SIZE 1
+
+static volatile int keep_running = 1;
 
 int main()
 {
@@ -19,17 +21,15 @@ int main()
     iic_init(IIC_INDEX);
 
     iic_reset(IIC_INDEX);
-    uint32_t my_register_map;
 
-    iic_set_slave_mode(IIC0, HEARTBEAT_IIC_ADDRESS, &my_register_map, BYTES_HEARTBEAT_DATA_SIZE);
-    
-    while (1)
-    {
-        ((uint8_t *)&my_register_map)[0] = 0x60;
+    uint32_t volatile regs[32] = {0};
+    iic_init(IIC_INDEX);
+    iic_reset(IIC_INDEX);
+
+    iic_set_slave_mode(IIC_INDEX, HEARTBEAT_IIC_ADDRESS, (uint32_t*) regs, sizeof(regs)/sizeof(regs[0]));
+    while (keep_running) {
         iic_slave_mode_handler(IIC_INDEX);
+        regs[0] = 0x80; //only up to 4 bytes for testing purposes
         sleep_msec(10);
     }
-
-    pynq_destroy();
-    return 0;
 }
