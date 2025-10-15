@@ -70,6 +70,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     while (keep_running)
     {
+        if (db_in->count == 0) {
+            continue;
+        }
+
         pthread_mutex_lock(mutex_in_buffer);
         databuffer_pop(db_in, val);
         pthread_mutex_unlock(mutex_in_buffer);

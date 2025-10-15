@@ -6,23 +6,18 @@
 #include <data_buffer.h>
 #include <pthread.h>
 
-// PYNQ LIBRARY DATA WRITER FROM BUFFER USING PWM
-
 typedef struct
 {
-    size_t msec_signal_duration;
-    uint32_t ticks_period;
-    uint8_t sync_signal;
     DataBuffer *buffer;
     pthread_mutex_t *mutex;
-    int pwm_chan;
-} pwm_multiplex_writer_args;
+    int uart_index;
+    size_t sleep_duration_msec;
+} uart_writer_args;
 
-void* pwm_multiplex_writer_fromargs(void *args);
+void *uart_writer_fromargs(void *args);
 
 // Duty encoded byte per frame
 // Duty Cycle(%) * 255(0b11111111) = data
-int pwm_multiplex_writer(size_t msec_signal_duration, uint32_t ticks_period, uint8_t sync_signal, DataBuffer *buffer,
-                         pthread_mutex_t *mutex, int pwm_chan);
+int uart_writer(DataBuffer *buffer, pthread_mutex_t *mutex, int uart_index, size_t sleep_duration_msec);
 
 #endif

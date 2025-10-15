@@ -3,34 +3,32 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-static inline uint32_t ticks_duty_cycle_calculator(uint8_t data, uint32_t ticks_period)
+void *uart_writer_fromargs(void *args)
 {
-    return (ticks_period * data) / UINT8_MAX;
+    uart_writer_args *writer_args = (uart_writer_args *)args;
+    return (void *)uart_writer(writer_args->buffer, writer_args->mutex, writer_args->uart_index, writer_args->sleep_duration_msec);
 }
 
-void* pwm_multiplex_writer_fromargs(void *args)
+int uart_writer(DataBuffer *buffer, pthread_mutex_t *mutex, int uart_index, size_t sleep_duration_msec)
 {
-    pwm_multiplex_writer_args *writer_args = (pwm_multiplex_writer_args *)args;
-    return (void *)pwm_multiplex_writer(writer_args->msec_signal_duration, writer_args->ticks_period, writer_args->sync_signal, writer_args->buffer, writer_args->mutex, writer_args->pwm_chan);
-}
+    uart_reset_fifos(uart_index);
 
-int pwm_multiplex_writer(size_t msec_signal_duration, uint32_t ticks_period, uint8_t sync_signal, DataBuffer *buffer, pthread_mutex_t *mutex, int pwm_chan)
-{
     uint8_t *val = malloc(sizeof(uint8_t) * buffer->array_len);
     while (1)
     {
+        if (buffer->count == 0)
+        {
+            continue;
+        }
         pthread_mutex_lock(mutex);
-        databuffer_pop(buffer, val); //! this might return old values or (0,0)
+        databuffer_pop(buffer, val);
         pthread_mutex_unlock(mutex);
-
-        pwm_set_duty_cycle(pwm_chan, ticks_duty_cycle_calculator(sync_signal, ticks_period));
-        sleep_msec(msec_signal_duration);
 
         for (size_t i = 0; i < buffer->array_len; i++)
         {
-            pwm_set_duty_cycle(pwm_chan, ticks_duty_cycle_calculator(val[i], ticks_period));
-            sleep_msec(msec_signal_duration);
+            uart_send(uart_index, val[i]);
         }
+        sleep_msec(sleep_duration_msec);
     }
     free(val);
 }
