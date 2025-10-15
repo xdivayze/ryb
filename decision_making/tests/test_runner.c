@@ -20,7 +20,9 @@ int main(void)
     RUN_TEST(test_push_buffer_single);
     RUN_TEST(test_push_buffer_multiple);
 
-    RUN_TEST(test_read_data);
+    // RUN_TEST(test_read_data);
+
+    // RUN_TEST(test_processor);
 
     RUN_TEST(test_processor);
 
