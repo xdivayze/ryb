@@ -28,7 +28,7 @@ void *call_data_process_fromargs(void *args)
 {
     data_process_args *dp_args = (data_process_args *)args;
 
-    return (void *)data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep, dp_args->display, dp_args->styling);
+    return (void *)data_process(dp_args->mutex_in_buffer,  dp_args->db_in,  dp_args->msec_sleep, dp_args->display, dp_args->styling);
 }
 
 int display_draw_default(display_t *display, stylistics *styling)
@@ -61,8 +61,7 @@ int display_string_on_display(display_t *display, char *val1, char *val2, char *
     return 0;
 }
 
-int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
-                 size_t msec_sleep, display_t *display, stylistics *styling)
+int data_process(pthread_mutex_t *mutex_in_buffer,  DataBuffer *db_in, size_t msec_sleep, display_t *display, stylistics *styling)
 {
     uint8_t *val = malloc(sizeof(uint8_t) * 2);
 
@@ -89,15 +88,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         char s3[4];
         int_as_string(val[0], s0);
         int_as_string(val[1], s1);
-        int_as_string(vals_out[1], s2);
-        int_as_string(vals_out[0], s3);
+        int_as_string(0, s2);
+        int_as_string(0, s3);
         display_string_on_display(display, s0, s1,
                                   s2, s3, styling);
-
-        pthread_mutex_lock(mutex_out_buffer);
-        databuffer_push(vals_out, db_out);
-        pthread_mutex_unlock(mutex_out_buffer);
-
         sleep_msec(msec_sleep);
     }
     displayFillScreen(display, RGB_WHITE);

@@ -22,9 +22,7 @@ typedef struct
 typedef struct
 {
     pthread_mutex_t *mutex_in_buffer;
-    pthread_mutex_t *mutex_out_buffer;
     DataBuffer *db_in;
-    DataBuffer *db_out;
     size_t msec_sleep;
     display_t *display;
     stylistics *styling;
@@ -36,6 +34,6 @@ int display_string_on_display(display_t *display, char *val1, char *val2, char *
                               stylistics *styling);
 int display_draw_default(display_t *display, stylistics *styling);
 
-int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out, size_t msec_sleep, display_t *display, stylistics *styling);
+int data_process(pthread_mutex_t *mutex_in_buffer,  DataBuffer *db_in, size_t msec_sleep, display_t *display, stylistics *styling);
 
 #endif
