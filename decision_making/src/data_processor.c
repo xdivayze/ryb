@@ -64,13 +64,14 @@ int display_string_on_display(display_t *display, char *val1, char *val2, char *
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
                  size_t msec_sleep, display_t *display, stylistics *styling)
 {
-    uint8_t *val = malloc(sizeof(uint8_t) * 2);
+    uint8_t *val = malloc(sizeof(uint8_t) * db_in->array_len);
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
 
     while (keep_running)
     {
         if (db_in->count == 0) {
+            sleep_msec(msec_sleep);
             continue;
         }
 

@@ -8,7 +8,7 @@
 #define GLOBAL_DATA_BUFFER_IN_CAPACITY 10
 #define GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH 2
 
-#define GLOBAL_DATA_BUFFER_OUT_CAPACITY 1
+#define GLOBAL_DATA_BUFFER_OUT_CAPACITY 2
 #define GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH 2
 
 #define IIC_SCL_PIN IO_AR0
@@ -108,6 +108,10 @@ int main()
     uart_init(UART_INDEX);
 
     uart_writer_args *w_args = malloc(sizeof(uart_writer_args));
+    w_args->buffer = databuffer_out;
+    w_args->mutex = &buffer_out_mutex;
+    w_args->sleep_duration_msec = 200;
+    w_args ->uart_index = UART_INDEX;
 
     pthread_t writer;
     pthread_create(&writer, NULL, uart_writer_fromargs, w_args);
@@ -116,11 +120,13 @@ int main()
     pthread_join(writer, NULL);
     pthread_join(processor, NULL);
 
+    
+
+    pynq_destroy();
+
     free(reader_in_args);
     free(w_args);
     free(processor_args);
-
-    pynq_destroy();
 
     return 0;
 }

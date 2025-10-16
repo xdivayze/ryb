@@ -18,6 +18,7 @@ int uart_writer(DataBuffer *buffer, pthread_mutex_t *mutex, int uart_index, size
     {
         if (buffer->count == 0)
         {
+            sleep_msec(sleep_duration_msec);
             continue;
         }
         pthread_mutex_lock(mutex);
