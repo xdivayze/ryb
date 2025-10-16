@@ -23,6 +23,8 @@ int main()
     switchbox_set_pin(UART_TX, SWB_UART0_TX);
     switchbox_set_pin(UART_RX, SWB_UART0_RX);
 
+    uart_init(UART_INDEX);
+
     DataBuffer *databuffer_in = databuffer_create(GLOBAL_DATA_BUFFER_IN_CAPACITY, GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH);
     pthread_mutex_t buffer_in_mutex;
     pthread_mutex_init(&buffer_in_mutex, NULL);
