@@ -21,8 +21,8 @@ typedef struct
     pthread_mutex_t *mutex_reader;
 } reader_args;
 
-void stop_i2c_writer(void);
-void stop_uart_reader(void);
+void stop_i2c_writer_test(void);
+void stop_uart_reader_test(void);
 
 void *i2c_writer(void *args);
 void *uart_reader(void *args);

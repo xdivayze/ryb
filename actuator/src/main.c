@@ -7,6 +7,9 @@
 #define GLOBAL_DATA_BUFFER_IN_CAPACITY 10
 #define GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH 2
 
+#define GLOBAL_DATA_BUFFER_OUT_CAPACITY 2
+#define GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH 1
+
 #define UART_INDEX UART0
 #define UART_TX IO_AR3
 #define UART_RX IO_AR4
@@ -28,6 +31,10 @@ int main()
     DataBuffer *databuffer_in = databuffer_create(GLOBAL_DATA_BUFFER_IN_CAPACITY, GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH);
     pthread_mutex_t buffer_in_mutex;
     pthread_mutex_init(&buffer_in_mutex, NULL);
+
+    DataBuffer *databuffer_out = databuffer_create(GLOBAL_DATA_BUFFER_OUT_CAPACITY, GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH);
+    pthread_mutex_t buffer_out_mutex;
+    pthread_mutex_init(&buffer_out_mutex, NULL);
 
     reader_args* r_args = malloc(sizeof(reader_args));
     r_args->db = databuffer_in;
@@ -62,9 +69,13 @@ int main()
     processor_args->msec_sleep = PROCESSOR_SLEEP_DURATION;
     processor_args->styling = styling;
     processor_args->display = &display;
+    processor_args->db_out = databuffer_out;
+    processor_args->mutex_out_buffer = &buffer_out_mutex;
 
     pthread_t processor;
     pthread_create(&processor, NULL, call_data_process_fromargs, processor_args);
+
+    //PWM WRITER INITIALIZATION 
 
     pthread_join(reader, NULL);
     pthread_join(processor, NULL);

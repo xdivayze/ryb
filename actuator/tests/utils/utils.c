@@ -3,14 +3,14 @@
 
 static volatile int keep_running = 1;
 
-void stop_i2c_writer(void)
+void stop_i2c_writer_test(void)
 {
     keep_running = 0;
 }
 
 static volatile int keep_uart_reader_running = 1;
 
-void stop_uart_reader(void)
+void stop_uart_reader_test(void)
 {
     keep_uart_reader_running = 0;
 }
@@ -44,7 +44,7 @@ void *uart_reader(void *args)
     while (keep_uart_reader_running)
     {
         if (casted_args->db_reader->count == casted_args->db_reader->buffer_capacity) {
-            stop_uart_reader();
+            stop_uart_reader_test();
         }
 
         for (int i = 0; i < casted_args->db_reader->array_len; i++)
