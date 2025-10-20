@@ -1,6 +1,6 @@
 /**/*.a
-decision_making/bin/
-decision_making/build/
+heartbeat/bin/
+heartbeat/build/
 /**/*.o
 data_sender/bin
 data_sender/build
