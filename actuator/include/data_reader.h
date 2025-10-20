@@ -1,9 +1,9 @@
 #ifndef DATA_READER_H
 #define DATA_READER_H
 
+#include <data_buffer.h>
 #include <libpynq.h>
 #include <pthread.h>
-#include <data_buffer.h>
 
 typedef struct
 {

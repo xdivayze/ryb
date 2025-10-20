@@ -2,7 +2,13 @@
     "files.associations": {
         "libpynq.h": "c",
         "data_buffer.h": "c",
-        "data_processor.h": "c"
+        "data_processor.h": "c",
+        "data_reader.h": "c",
+        "stdlib.h": "c",
+        "stddef.h": "c",
+        "stdint.h": "c",
+        "pthread.h": "c"
     },
-    "makefile.makefilePath": "${workspaceFolder}/decision_making/Makefile"
+    "makefile.makefilePath": "${workspaceFolder}/actuator/Makefile",
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
 }
