@@ -2,6 +2,10 @@
 
 heartbeat
 
+decision_making
+
+crying
+
 /**/*.o
 actuator/bin/
 actuator/build/
