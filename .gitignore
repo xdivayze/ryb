@@ -1,6 +1,7 @@
 /**/*.a
-heartbeat/bin/
-heartbeat/build/
+
+heartbeat
+
 /**/*.o
 actuator/bin/
 actuator/build/
