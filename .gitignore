@@ -2,7 +2,3 @@
 heartbeat/bin/
 heartbeat/build/
 /**/*.o
-data_sender/bin
-data_sender/build
-
-/actuator
