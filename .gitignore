@@ -2,3 +2,9 @@
 heartbeat/bin/
 heartbeat/build/
 /**/*.o
+
+actuator
+
+decision_making
+
+crying
