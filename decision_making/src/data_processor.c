@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <libpynq.h>
 #include "data_processor.h"
+#include "algorithm.h"
+#include <stdbool.h>
 
 #define HEARTBEAT_DISPLAY_TEXT "IN1"
 #define CRYING_DISPLAY_TEXT "IN2"
@@ -68,9 +70,19 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
 
+    int scores[] = {-1, -1, -1, -1};
+    tile *initial_tile = new_tile(4, 4, scores); // initialize the max stress tile
+    insert_tile_into_matrix(initial_tile, false);
+
+    tile* curr_tile = initial_tile;
+
+    float out_arr[] = {0.0f, 0.0f};
+    uint8_t vals_out[2] = {0,0};
+
     while (keep_running)
     {
-        if (db_in->count == 0) {
+        if (db_in->count == 0)
+        {
             sleep_msec(msec_sleep);
             continue;
         }
@@ -79,10 +91,14 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         databuffer_pop(db_in, val);
         pthread_mutex_unlock(mutex_in_buffer);
 
-        uint8_t vals_out[2] = {val[0] + 1, val[1] + 1};
-
         displayFillScreen(display, RGB_WHITE);
         display_draw_default(display, styling);
+
+        curr_tile = determine_next_tile(curr_tile);
+        get_tile_output_values(curr_tile, out_arr);
+
+        vals_out[0] = (uint8_t) (out_arr[0] * 100);
+        vals_out[1] = (uint8_t) (out_arr[1]);
 
         char s0[4];
         char s1[4];

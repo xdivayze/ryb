@@ -23,6 +23,8 @@ tile *determine_next_tile(tile *curr_tile)
 
     for (int i = 0; i < arr_size; i++)
     {
+        int scores[] = {-1, -1, -1, -1};
+
         size_t score_index = 3 - i; // represents the relation of the next tile with the current tile
         switch (relativity_order[i])
         {
@@ -59,8 +61,6 @@ tile *determine_next_tile(tile *curr_tile)
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                int scores[] = {0, 0, 0, 0};
-                scores[score_index] = -1;
                 tile *newly_generated_tile = new_tile(curr_tile->location[0] + 1, curr_tile->location[1], scores);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
@@ -104,8 +104,6 @@ tile *determine_next_tile(tile *curr_tile)
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                int scores[] = {0, 0, 0, 0};
-                scores[score_index] = -1;
                 tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] - 1, scores);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
@@ -149,8 +147,6 @@ tile *determine_next_tile(tile *curr_tile)
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                int scores[] = {0, 0, 0, 0};
-                scores[score_index] = -1;
                 tile *newly_generated_tile = new_tile(curr_tile->location[0] - 1, curr_tile->location[1], scores);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
@@ -194,8 +190,6 @@ tile *determine_next_tile(tile *curr_tile)
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                int scores[] = {0, 0, 0, 0};
-                scores[score_index] = -1;
                 tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] + 1, scores);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
@@ -210,6 +204,12 @@ tile *determine_next_tile(tile *curr_tile)
             break;
         }
     }
+}
+
+void get_tile_output_values(tile* curr_tile, float* out_arr){
+    out_arr[0] = FREQUENCIES[ curr_tile->location[0]];
+    out_arr[1] = FREQUENCIES[curr_tile->location[1]];
+    return;
 }
 
 tile *new_tile(size_t loc0, size_t loc1, int *scores)

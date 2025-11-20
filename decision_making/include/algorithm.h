@@ -44,6 +44,8 @@ tile *determine_next_tile(tile *curr_tile);
 // returns -1 if overwrite is false and a tile already exists in that location
 int insert_tile_into_matrix(tile *curr_tile, bool overwrite);
 
+void get_tile_output_values(tile* curr_tile, float* out_arr);
+
 
 // overwrites all matrix data with zero arrays
 void initialize_matrix_data(size_t size);
