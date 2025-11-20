@@ -10,8 +10,8 @@ static char relativity_order[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_B
 
 static matrix algorithm_matrix = {
     .data = {0, 0, 0, 0, 0}, // dummy data overwritten  by initialization of data
-    .label_cols = &FREQUENCIES,
-    .label_rows = &AMPLITUDES};
+    .label_cols = (float *)&(FREQUENCIES[0]),
+    .label_rows = (int *)&(AMPLITUDES[0])};
 
 tile *determine_next_tile(tile *curr_tile)
 {
@@ -23,7 +23,7 @@ tile *determine_next_tile(tile *curr_tile)
 
     for (int i = 0; i < arr_size; i++)
     {
-        size_t score_index = 3 - i; //represents the relation of the next tile with the current tile
+        size_t score_index = 3 - i; // represents the relation of the next tile with the current tile
         switch (relativity_order[i])
         {
         case RELATIVITY_RIGHT:
@@ -35,7 +35,7 @@ tile *determine_next_tile(tile *curr_tile)
             tile *right_tile = algorithm_matrix.data[curr_tile->location[0] + 1][curr_tile->location[1]];
             if (right_tile != 0)
             {
-                int tile_data = right_tile->scores[score_index].data;
+                int tile_data = right_tile->scores[score_index]->data;
                 if (tile_data == 0)
                 {
                     break; // case where the indexed tile has a less score
@@ -80,7 +80,7 @@ tile *determine_next_tile(tile *curr_tile)
             tile *top_tile = algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1] - 1];
             if (top_tile != 0)
             {
-                int tile_data = top_tile->scores[score_index].data;
+                int tile_data = top_tile->scores[score_index]->data;
                 if (tile_data == 0)
                 {
                     break; // case where the indexed tile has a less score
@@ -116,15 +116,16 @@ tile *determine_next_tile(tile *curr_tile)
                 break;
             }
         }
-        case RELATIVITY_LEFT: {
+        case RELATIVITY_LEFT:
+        {
             if (curr_tile->location[0] == 0)
             { // break if leftmost tile in the matrix
                 break;
             }
-            tile *left_tile = algorithm_matrix.data[curr_tile->location[0] -1][curr_tile->location[1]];
+            tile *left_tile = algorithm_matrix.data[curr_tile->location[0] - 1][curr_tile->location[1]];
             if (left_tile != 0)
             {
-                int tile_data = left_tile->scores[score_index].data;
+                int tile_data = left_tile->scores[score_index]->data;
                 if (tile_data == 0)
                 {
                     break; // case where the indexed tile has a less score
@@ -160,7 +161,8 @@ tile *determine_next_tile(tile *curr_tile)
                 break;
             }
         }
-        case RELATIVITY_BOTTOM: {
+        case RELATIVITY_BOTTOM:
+        {
             if (curr_tile->location[1] == MATRIX_SIZE - 1)
             { // break if bottommost tile in the matrix
                 break;
@@ -168,7 +170,7 @@ tile *determine_next_tile(tile *curr_tile)
             tile *bottom_tile = algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1] + 1];
             if (bottom_tile != 0)
             {
-                int tile_data = bottom_tile->scores[score_index].data;
+                int tile_data = bottom_tile->scores[score_index]->data;
                 if (tile_data == 0)
                 {
                     break; // case where the indexed tile has a less score
@@ -237,10 +239,10 @@ void initialize_matrix_data(size_t size)
 {
     for (int i = 0; i < size; i++)
     {
-        int *zero_arr = malloc(sizeof(int) * size);
+        uint8_t *zero_arr = malloc(sizeof(uint8_t) * size);
         memset(zero_arr, 0, size);
 
-        algorithm_matrix.data[i] = zero_arr;
+        algorithm_matrix.data[i] = (tile **)zero_arr;
     }
 }
 

@@ -22,7 +22,7 @@ typedef struct
 typedef struct
 {
     size_t *location; // row, column array position, has size 2
-    score *scores;    // has size 4 for all x and y relations following r t l b as 0-3 indices
+    score **scores;    // has size 4 for all x and y relations following r t l b as 0-3 indices
 } tile;
 
 // data has array of tile arrays which are the columns access done via matrix.data[col][row]
@@ -30,7 +30,7 @@ typedef struct
 {
     tile ***data;
     int *label_rows; // values of each row
-    int *label_cols; // values of each column
+    float *label_cols; // values of each column
 } matrix;
 
 // determines the next tile to use
