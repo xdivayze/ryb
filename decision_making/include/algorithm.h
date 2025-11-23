@@ -14,7 +14,8 @@
 #define RELATIVITY_RIGHT 'r'
 
 extern int initial_stress;
-extern char relativity_order[5];
+extern char relativity_order_actual[5];
+extern char relativity_order_opposites[5];
 
 typedef struct
 {

@@ -6,7 +6,7 @@
 static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
 static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
 
-char relativity_order[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_BOTTOM, RELATIVITY_LEFT};
+char relativity_order_opposites[] = {2,3,0,1};
 char relativity_order_actual[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_LEFT, RELATIVITY_BOTTOM};
 
 static matrix algorithm_matrix = {
@@ -17,6 +17,10 @@ static matrix algorithm_matrix = {
 tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by program
 {
 
+    if ((curr_tile->location[0] == curr_tile->location[1]) && (curr_tile->location[0] == 0)) {
+        return curr_tile;
+    }
+
     size_t arr_size = 4;
 
     int highest_score = 0; // if highest score is 0; -1, 1 or 2 take over. -1 is never written as long as highest_score is 0 -1 is updated at alt tile
@@ -25,9 +29,9 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
     for (int i = 0; i < arr_size; i++)
     {
         int scores[] = {-1, -1, -1, -1};
+        int score_index = relativity_order_opposites[i];
 
-        size_t score_index = 3 - i; // represents the relation of the next tile with the current tile
-        switch (relativity_order[i])
+        switch (relativity_order_actual[i])
         {
         case RELATIVITY_RIGHT:
         {
@@ -76,6 +80,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
 
                 break;
             }
+            break;
         }
         case RELATIVITY_TOP:
         {
@@ -109,6 +114,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
                     alt_tile = top_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
                     break;
                 }
+                break;
             }
             else
             {
@@ -175,6 +181,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
 
                 break;
             }
+            break;
         }
         case RELATIVITY_BOTTOM:
         {
@@ -226,6 +233,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
 
                 break;
             }
+            break;
         }
         default:
             break;

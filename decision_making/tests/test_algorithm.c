@@ -60,12 +60,12 @@ void test_tile_detection(void)
     int relativity = -1;
 
     struct timespec ts;
-    ts.tv_nsec = 500 * 1000 * 1000;
-    ts.tv_sec = 500 / 1000;
+    ts.tv_nsec = 50 * 1000 * 1000;
+    ts.tv_sec = 50 / 1000;
 
     while (keep_running)
     {
-        if (last_stress != initial_stress && current_stress == initial_stress)
+        if (current_stress > last_stress)
         {
             printf("panic jump\n");
             curr_tile = initial_tile; // panic jump
@@ -73,11 +73,11 @@ void test_tile_detection(void)
 
         last_tile = curr_tile;
 
-        curr_tile = determine_next_tile(curr_tile, &relativity);
+        curr_tile = determine_next_tile(curr_tile, &relativity); //causes sigsegv by returning null if at 0,0 so no suitable conditions
 
         last_tile->scores[relativity]->data = check_tile(last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
         
-        curr_tile->scores[3-relativity]->data = check_tile(last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
+        curr_tile->scores[relativity_order_opposites[relativity]]->data = check_tile(curr_tile->location[0], curr_tile->location[1], last_tile->location[0], last_tile->location[1]);
 
         last_stress = current_stress;
         current_stress = test_matrix[curr_tile->location[1]][curr_tile->location[0]];
