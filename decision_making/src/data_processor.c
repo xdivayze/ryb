@@ -16,6 +16,8 @@
 
 static volatile int keep_running = 1;
 
+int initial_stress;
+
 void stop_processing(void)
 {
     keep_running = 0;
@@ -66,7 +68,7 @@ int display_string_on_display(display_t *display, char *val1, char *val2, char *
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
                  size_t msec_sleep, display_t *display, stylistics *styling)
 {
-    uint8_t *val = malloc(sizeof(uint8_t) * db_in->array_len);
+    uint8_t *val = malloc(sizeof(uint8_t) * db_in->array_len); // 0: heartbeat 1: crying
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
 
@@ -74,10 +76,25 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     tile *initial_tile = new_tile(4, 4, scores); // initialize the max stress tile
     insert_tile_into_matrix(initial_tile, false);
 
-    tile* curr_tile = initial_tile;
+    tile *curr_tile = initial_tile;
+    int last_stress;
+    int current_stress;
 
     float out_arr[] = {0.0f, 0.0f};
-    uint8_t vals_out[2] = {0,0};
+    uint8_t vals_out[2] = {0, 0};
+
+    pthread_mutex_lock(mutex_in_buffer);
+    databuffer_pop(db_in, val);
+    pthread_mutex_unlock(mutex_in_buffer);
+
+    int stress = get_stress_level(val[0], val[1]);
+
+    if (stress == -1)
+    {
+        return -1; // TODO error handling instead of returning
+    }
+
+    initial_stress = stress;
 
     while (keep_running)
     {
@@ -94,11 +111,18 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         displayFillScreen(display, RGB_WHITE);
         display_draw_default(display, styling);
 
+        // TODO wait and check for stat changes in baby,
+
+        if (last_stress != initial_stress && current_stress == initial_stress)
+        {
+            curr_tile = initial_tile; // panic jump
+        }
+
         curr_tile = determine_next_tile(curr_tile);
         get_tile_output_values(curr_tile, out_arr);
 
-        vals_out[0] = (uint8_t) (out_arr[0] * 100);
-        vals_out[1] = (uint8_t) (out_arr[1]);
+        vals_out[0] = (uint8_t)(out_arr[0] * 100);
+        vals_out[1] = (uint8_t)(out_arr[1]);
 
         char s0[4];
         char s1[4];

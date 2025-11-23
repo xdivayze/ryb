@@ -13,6 +13,8 @@
 #define RELATIVITY_LEFT 'l'
 #define RELATIVITY_RIGHT 'r'
 
+extern int initial_stress;
+
 typedef struct
 {
     char relativity; // descrive to which tile the data is relative to, uses relativity definitions above
@@ -52,6 +54,8 @@ void initialize_matrix_data(size_t size);
 
 // score array parameter is only used as a reference and not pointed to by the location field in the tile object
 tile *new_tile(size_t loc0, size_t loc1, int *scores);
+
+int get_stress_level(int heartbeat, int crying);
 
 void free_matrix();
 

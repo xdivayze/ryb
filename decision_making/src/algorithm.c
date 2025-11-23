@@ -206,8 +206,9 @@ tile *determine_next_tile(tile *curr_tile)
     }
 }
 
-void get_tile_output_values(tile* curr_tile, float* out_arr){
-    out_arr[0] = FREQUENCIES[ curr_tile->location[0]];
+void get_tile_output_values(tile *curr_tile, float *out_arr)
+{
+    out_arr[0] = FREQUENCIES[curr_tile->location[0]];
     out_arr[1] = FREQUENCIES[curr_tile->location[1]];
     return;
 }
@@ -264,4 +265,23 @@ void free_matrix()
     // free data arrays
     // free tile location arrays
     // free scores
+}
+
+// checks for only crying data if provided valid range.
+int get_stress_level(int heartbeat, int crying)
+{
+    if (crying < 100 && crying >= 0)
+    { // crying data only valid between open interval (100,0) where stres is (0,50)
+        int m = (50 - 10) / 100;
+        int c = 10;
+        return m * crying + c; // linear interpolation
+    }
+
+    if (heartbeat <= 60 || heartbeat > 240)
+        return -1; //-1 if no data is in valid range
+
+    int m = (100 - 10) / (240 - 60);
+    int c = -20;
+
+    return (m * heartbeat + c); // linear interpolation
 }
