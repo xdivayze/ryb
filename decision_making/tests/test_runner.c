@@ -1,11 +1,14 @@
 #include <unity.h>
 
+
 void test_push_buffer_multiple(void);
 void test_push_buffer_single(void);
 void test_create_buffer(void);
 void test_read_data(void);
 void test_processor(void);
 void test_write(void);
+void test_stress_calculation(void);
+void test_tile_detection(void);
 
 void setUp(void)
 {
@@ -24,7 +27,8 @@ int main(void)
 
     // RUN_TEST(test_processor);
 
-    RUN_TEST(test_processor);
+    RUN_TEST(test_stress_calculation);
+    RUN_TEST(test_tile_detection);
 
     return UNITY_END();
 }

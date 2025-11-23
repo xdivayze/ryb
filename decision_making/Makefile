@@ -8,7 +8,7 @@ CFLAGS := -D_GNU_SOURCE
 APP_MAIN    := src/main.c
 
 
-OPT       := -O2
+OPT       := -O0
 DBG       := -g
 
 LDFLAGS   :=

@@ -72,6 +72,8 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     displaySetFontDirection(display, TEXT_DIRECTION0);
 
+    initialize_matrix_data(5);
+
     int scores[] = {-1, -1, -1, -1};
     tile *initial_tile = new_tile(4, 4, scores); // initialize the max stress tile
     insert_tile_into_matrix(initial_tile, false);
@@ -93,6 +95,8 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     {
         return -1; // TODO error handling instead of returning
     }
+
+    int relativity;
 
     initial_stress = stress;
 
@@ -118,7 +122,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
             curr_tile = initial_tile; // panic jump
         }
 
-        curr_tile = determine_next_tile(curr_tile);
+        curr_tile = determine_next_tile(curr_tile, &relativity);
         get_tile_output_values(curr_tile, out_arr);
 
         vals_out[0] = (uint8_t)(out_arr[0] * 100);

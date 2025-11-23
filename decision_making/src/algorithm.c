@@ -2,18 +2,19 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
 static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
 
-static char relativity_order[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_BOTTOM, RELATIVITY_LEFT};
+char relativity_order[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_BOTTOM, RELATIVITY_LEFT};
+char relativity_order_actual[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_LEFT, RELATIVITY_BOTTOM};
 
 static matrix algorithm_matrix = {
     .data = {0, 0, 0, 0, 0}, // dummy data overwritten  by initialization of data
     .label_cols = (float *)&(FREQUENCIES[0]),
     .label_rows = (int *)&(AMPLITUDES[0])};
 
-tile *determine_next_tile(tile *curr_tile)
+tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by program
 {
 
     size_t arr_size = 4;
@@ -30,12 +31,13 @@ tile *determine_next_tile(tile *curr_tile)
         {
         case RELATIVITY_RIGHT:
         {
-            if (curr_tile->location[0] == MATRIX_SIZE - 1)
+            if (curr_tile->location[1] == MATRIX_SIZE - 1)
             { // break if rightmost tile in the matrix
                 break;
             }
-            tile *right_tile = algorithm_matrix.data[curr_tile->location[0] + 1][curr_tile->location[1]];
-            if (right_tile != 0)
+
+            tile *right_tile = algorithm_matrix.data[curr_tile->location[1] + 1][curr_tile->location[0]];
+            if (right_tile)
             {
                 int tile_data = right_tile->scores[score_index]->data;
                 if (tile_data == 0)
@@ -44,146 +46,20 @@ tile *determine_next_tile(tile *curr_tile)
                 }
                 if (tile_data == 2)
                 {
+                    *relativity = 0;
                     return right_tile; // return first higher score tile
                 }
                 if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
                 {
+                    *relativity = 0;
                     alt_tile = right_tile;
                     highest_score = 1;
                     break;
                 }
-                if (tile_data == -1 && highest_score == 0 && !alt_tile)
+                if (tile_data == -1 && (!alt_tile || highest_score == 1))
                 {
+                    *relativity = 0;
                     alt_tile = right_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
-                    break;
-                }
-            }
-            else
-            {
-                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0] + 1, curr_tile->location[1], scores);
-                insert_tile_into_matrix(newly_generated_tile, false);
-                if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
-                {
-                    alt_tile = newly_generated_tile;
-                }
-
-                break;
-            }
-        }
-        case RELATIVITY_TOP:
-        {
-            if (curr_tile->location[1] == 0)
-            { // break if topmost tile in the matrix
-                break;
-            }
-            tile *top_tile = algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1] - 1];
-            if (top_tile != 0)
-            {
-                int tile_data = top_tile->scores[score_index]->data;
-                if (tile_data == 0)
-                {
-                    break; // case where the indexed tile has a less score
-                }
-                if (tile_data == 2)
-                {
-                    return top_tile; // return first higher score tile
-                }
-                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
-                {
-                    alt_tile = top_tile;
-                    highest_score = 1;
-                    break;
-                }
-                if (tile_data == -1 && highest_score == 0 && !alt_tile)
-                {
-                    alt_tile = top_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
-                    break;
-                }
-            }
-            else
-            {
-                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] - 1, scores);
-                insert_tile_into_matrix(newly_generated_tile, false);
-                if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
-                {
-                    alt_tile = newly_generated_tile;
-                }
-
-                break;
-            }
-        }
-        case RELATIVITY_LEFT:
-        {
-            if (curr_tile->location[0] == 0)
-            { // break if leftmost tile in the matrix
-                break;
-            }
-            tile *left_tile = algorithm_matrix.data[curr_tile->location[0] - 1][curr_tile->location[1]];
-            if (left_tile != 0)
-            {
-                int tile_data = left_tile->scores[score_index]->data;
-                if (tile_data == 0)
-                {
-                    break; // case where the indexed tile has a less score
-                }
-                if (tile_data == 2)
-                {
-                    return left_tile; // return first higher score tile
-                }
-                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
-                {
-                    alt_tile = left_tile;
-                    highest_score = 1;
-                    break;
-                }
-                if (tile_data == -1 && highest_score == 0 && !alt_tile)
-                {
-                    alt_tile = left_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
-                    break;
-                }
-            }
-            else
-            {
-                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0] - 1, curr_tile->location[1], scores);
-                insert_tile_into_matrix(newly_generated_tile, false);
-                if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
-                {
-                    alt_tile = newly_generated_tile;
-                }
-
-                break;
-            }
-        }
-        case RELATIVITY_BOTTOM:
-        {
-            if (curr_tile->location[1] == MATRIX_SIZE - 1)
-            { // break if bottommost tile in the matrix
-                break;
-            }
-            tile *bottom_tile = algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1] + 1];
-            if (bottom_tile != 0)
-            {
-                int tile_data = bottom_tile->scores[score_index]->data;
-                if (tile_data == 0)
-                {
-                    break; // case where the indexed tile has a less score
-                }
-                if (tile_data == 2)
-                {
-                    return bottom_tile; // return first higher score tile
-                }
-                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
-                {
-                    alt_tile = bottom_tile;
-                    highest_score = 1;
-                    break;
-                }
-                if (tile_data == -1 && highest_score == 0 && !alt_tile)
-                {
-                    alt_tile = bottom_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
                     break;
                 }
             }
@@ -192,8 +68,159 @@ tile *determine_next_tile(tile *curr_tile)
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
                 tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] + 1, scores);
                 insert_tile_into_matrix(newly_generated_tile, false);
-                if (highest_score == 0 && !alt_tile) // update alternative tile to the unknown tile if no higher score or alternative tile exists
+                if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
                 {
+                    *relativity = 0;
+                    alt_tile = newly_generated_tile;
+                }
+
+                break;
+            }
+        }
+        case RELATIVITY_TOP:
+        {
+            if (curr_tile->location[0] == 0)
+            { // break if topmost tile in the matrix
+                break;
+            }
+            tile *top_tile = algorithm_matrix.data[curr_tile->location[1]][curr_tile->location[0] - 1];
+            if (top_tile)
+            {
+                int tile_data = top_tile->scores[score_index]->data;
+                if (tile_data == 0)
+                {
+                    break; // case where the indexed tile has a less score
+                }
+                if (tile_data == 2)
+                {
+                    *relativity = 1;
+                    return top_tile; // return first higher score tile
+                }
+                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
+                {
+                    *relativity = 1;
+                    alt_tile = top_tile;
+                    highest_score = 1;
+                    break;
+                }
+                if (tile_data == -1 && (!alt_tile || highest_score == 1))
+                {
+                    *relativity = 1;
+                    alt_tile = top_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
+                    break;
+                }
+            }
+            else
+            {
+                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
+                tile *newly_generated_tile = new_tile(curr_tile->location[0] - 1, curr_tile->location[1], scores);
+                insert_tile_into_matrix(newly_generated_tile, false);
+                if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
+                {
+                    *relativity = 1;
+
+                    alt_tile = newly_generated_tile;
+                }
+
+                break;
+            }
+        }
+        case RELATIVITY_LEFT:
+        {
+            if (curr_tile->location[1] == 0)
+            { // break if leftmost tile in the matrix
+                break;
+            }
+            tile *left_tile = algorithm_matrix.data[curr_tile->location[1] - 1][curr_tile->location[0]];
+            if (left_tile)
+            {
+                int tile_data = left_tile->scores[score_index]->data;
+                if (tile_data == 0)
+                {
+                    break; // case where the indexed tile has a less score
+                }
+                if (tile_data == 2)
+                {
+                    *relativity = 2;
+
+                    return left_tile; // return first higher score tile
+                }
+                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
+                {
+                    *relativity = 2;
+
+                    alt_tile = left_tile;
+                    highest_score = 1;
+                    break;
+                }
+                if (tile_data == -1 && (!alt_tile || highest_score == 1))
+                {
+                    *relativity = 2;
+
+                    alt_tile = left_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
+                    break;
+                }
+            }
+            else
+            {
+                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
+                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] - 1, scores);
+                insert_tile_into_matrix(newly_generated_tile, false);
+                if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
+                {
+                    *relativity = 2;
+
+                    alt_tile = newly_generated_tile;
+                }
+
+                break;
+            }
+        }
+        case RELATIVITY_BOTTOM:
+        {
+            if (curr_tile->location[0] == MATRIX_SIZE - 1)
+            { // break if bottommost tile in the matrix
+                break;
+            }
+            tile *bottom_tile = algorithm_matrix.data[curr_tile->location[1]][curr_tile->location[0] + 1];
+            if (bottom_tile)
+            {
+                int tile_data = bottom_tile->scores[score_index]->data;
+                if (tile_data == 0)
+                {
+                    break; // case where the indexed tile has a less score
+                }
+                if (tile_data == 2)
+                {
+                    *relativity = 3;
+
+                    return bottom_tile; // return first higher score tile
+                }
+                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
+                {
+                    *relativity = 3;
+
+                    alt_tile = bottom_tile;
+                    highest_score = 1;
+                    break;
+                }
+                if (tile_data == -1 && (!alt_tile || highest_score == 1))
+                {
+                    *relativity = 3;
+
+                    alt_tile = bottom_tile; // update alternative tile to the unknown tile if only lower score tiles are found and no alternative tile exists
+                    break;
+                }
+            }
+            else
+            {
+                // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
+                tile *newly_generated_tile = new_tile(curr_tile->location[0] + 1, curr_tile->location[1], scores);
+                insert_tile_into_matrix(newly_generated_tile, false);
+                if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
+                {
+                    *relativity = 3;
+
                     alt_tile = newly_generated_tile;
                 }
 
@@ -204,28 +231,30 @@ tile *determine_next_tile(tile *curr_tile)
             break;
         }
     }
+
+    return alt_tile;
 }
 
 void get_tile_output_values(tile *curr_tile, float *out_arr)
 {
-    out_arr[0] = FREQUENCIES[curr_tile->location[0]];
+    out_arr[0] = AMPLITUDES[curr_tile->location[0]];
     out_arr[1] = FREQUENCIES[curr_tile->location[1]];
     return;
 }
-
+// loc0 row; loc1 col
 tile *new_tile(size_t loc0, size_t loc1, int *scores)
 {
     size_t *loc_arr = malloc(sizeof(size_t) * 2);
     loc_arr[0] = loc0;
     loc_arr[1] = loc1;
 
-    score **score_arr = malloc(sizeof(score *) * 4);
+    score **score_arr = calloc(4, sizeof(score *));
 
     for (int i = 0; i < 4; i++)
     {
         score *new_score_obj = malloc(sizeof(score));
-        new_score_obj->data = scores[i];
-        new_score_obj->relativity = relativity_order[i];
+        new_score_obj->data= scores[i];
+        new_score_obj->relativity = relativity_order_actual[i];
         score_arr[i] = new_score_obj;
     }
 
@@ -238,23 +267,22 @@ tile *new_tile(size_t loc0, size_t loc1, int *scores)
 
 void initialize_matrix_data(size_t size)
 {
+    algorithm_matrix.data = malloc(size * sizeof(tile **));
+
     for (int i = 0; i < size; i++)
     {
-        uint8_t *zero_arr = malloc(sizeof(uint8_t) * size);
-        memset(zero_arr, 0, size);
-
-        algorithm_matrix.data[i] = (tile **)zero_arr;
+        algorithm_matrix.data[i] = calloc(size, sizeof(tile *));
     }
 }
 
 int insert_tile_into_matrix(tile *curr_tile, bool overwrite)
 {
-    if (!overwrite && algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1]]) // default empty matrix values are 0 by definition
+    if (!overwrite && algorithm_matrix.data[curr_tile->location[1]][curr_tile->location[0]]) // default empty matrix values are 0 by definition
     {
         return -1;
     }
 
-    algorithm_matrix.data[curr_tile->location[0]][curr_tile->location[1]] = curr_tile;
+    algorithm_matrix.data[curr_tile->location[1]][curr_tile->location[0]] = curr_tile;
 
     return 0;
 }
@@ -268,20 +296,20 @@ void free_matrix()
 }
 
 // checks for only crying data if provided valid range.
-int get_stress_level(int heartbeat, int crying)
+float get_stress_level(int heartbeat, int crying)
 {
     if (crying < 100 && crying >= 0)
     { // crying data only valid between open interval (100,0) where stres is (0,50)
-        int m = (50 - 10) / 100;
-        int c = 10;
-        return m * crying + c; // linear interpolation
+        float m = (50.0f - 10.0f) / 100.0f;
+        float c = 10.0f;
+        return (m * crying) + c; // linear interpolation
     }
 
     if (heartbeat <= 60 || heartbeat > 240)
         return -1; //-1 if no data is in valid range
 
-    int m = (100 - 10) / (240 - 60);
-    int c = -20;
+    float m = (100.0f - 10.0f) / (240.0f - 60.0f);
+    float c = -20.0f;
 
-    return (m * heartbeat + c); // linear interpolation
+    return ((m * heartbeat) + c); // linear interpolation
 }

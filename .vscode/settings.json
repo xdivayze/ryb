@@ -8,7 +8,8 @@
         "string.h": "c",
         "data_writer.h": "c",
         "data_read.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "time.h": "c"
     },
     "makefile.makefilePath": "${workspaceFolder}/decision_making/Makefile"
 }
