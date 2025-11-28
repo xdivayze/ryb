@@ -10,6 +10,7 @@ static int display_initialized = 0;
 void initialize_display() {
     if (!display_initialized) {
         display_init(&display);
+        display_initialized = 1;
     }
 }
 

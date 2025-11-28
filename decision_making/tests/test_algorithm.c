@@ -31,6 +31,8 @@ static int check_tile(int row, int col, int nrow, int ncol)
     }
 }
 
+int max_stress = 9;
+
 void test_stress_calculation(void)
 {
     int crying = 80;
@@ -50,7 +52,7 @@ void test_tile_detection(void)
     initialize_matrix_data(5);
 
     int scores[] = {-1, -1, -1, -1};
-    tile *initial_tile = new_tile(4, 4, &(scores[0]), MAX_STRESS); // initialize the max stress tile
+    tile *initial_tile = new_tile(4, 4, &(scores[0]), max_stress); // initialize the max stress tile
     insert_tile_into_matrix(initial_tile, false);
 
     tile *curr_tile = initial_tile;
@@ -90,20 +92,22 @@ void test_tile_detection(void)
         printf("last stress: %i; current stress: %i;\n current tile location: r:%li c:%li; last tile location: r:%li c:%li;\n", last_stress, current_stress, curr_tile->location[0], curr_tile->location[1], last_tile->location[0], last_tile->location[1]);
         if ((current_stress == last_stress) && (last_stress == 1))
         {
-
+            TEST_PASS();
             break;
         }
         nanosleep(&ts, NULL);
     }
 }
 
-void test_tile_detection_with_display()
+void test_tile_detection_with_display(void)
 {
+    pynq_init();
+    initialize_display();
 
     initialize_matrix_data(5);
 
     int scores[] = {-1, -1, -1, -1};
-    tile *initial_tile = new_tile(4, 4, &(scores[0]), MAX_STRESS); // initialize the max stress tile
+    tile *initial_tile = new_tile(4, 4, &(scores[0]), max_stress); // initialize the max stress tile
     insert_tile_into_matrix(initial_tile, false);
 
     tile *curr_tile = initial_tile;
@@ -120,10 +124,10 @@ void test_tile_detection_with_display()
     int relativity = -1;
 
     struct timespec ts;
-    ts.tv_nsec = 50 * 1000 * 1000;
-    ts.tv_sec = 50 / 1000;
+    ts.tv_nsec = 500 * 1000 * 1000;
+    ts.tv_sec = 500 / 1000;
 
-    initialize_display();
+    
     displayFillScreen(&display, RGB_WHITE);
 
     matrix *alg_matrix = get_matrix();
@@ -157,9 +161,11 @@ void test_tile_detection_with_display()
         if ((current_stress == last_stress) && (last_stress == 1))
         {
             displayFillScreen(&display, RGB_WHITE);
+            TEST_PASS();
             break;
         }
 
         nanosleep(&ts, NULL);
     }
+    pynq_destroy();
 }

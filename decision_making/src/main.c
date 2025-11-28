@@ -22,6 +22,8 @@
 
 #define FONT_PATH "/home/student/ryb/fonts/ILGH16XB.FNT"
 
+int max_stress = 100;
+
 display_t display;
 
 int main()

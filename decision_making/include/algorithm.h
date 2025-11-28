@@ -13,7 +13,7 @@
 #define RELATIVITY_LEFT 'l'
 #define RELATIVITY_RIGHT 'r'
 
-#define MAX_STRESS 100
+extern int max_stress;
 
 extern int initial_stress;
 extern char relativity_order_actual[5];

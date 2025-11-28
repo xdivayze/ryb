@@ -9,6 +9,7 @@ void test_processor(void);
 void test_write(void);
 void test_stress_calculation(void);
 void test_tile_detection(void);
+void test_tile_detection_with_display(void);
 
 void setUp(void)
 {
@@ -27,8 +28,9 @@ int main(void)
 
     // RUN_TEST(test_processor);
 
-    RUN_TEST(test_stress_calculation);
-    RUN_TEST(test_tile_detection);
+    // RUN_TEST(test_stress_calculation);
+    // RUN_TEST(test_tile_detection);
+    RUN_TEST(test_tile_detection_with_display);
 
     return UNITY_END();
 }

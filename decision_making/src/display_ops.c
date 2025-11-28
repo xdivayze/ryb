@@ -8,12 +8,12 @@ static uint16_t score_color_converter(int stress)
 {
     if (stress == -1)
         return RGB_WHITE;
-    if ((stress < 1) || (stress > MAX_STRESS))
+    if ((stress < 1) || (stress > max_stress))
     {
         return -1;
     }
 
-    float alpha = (1.0f / (float)MAX_STRESS) * stress;
+    float alpha = (1.0f / (float)max_stress) * (9 - stress);
     uint8_t g = 0x3F;
     uint16_t r = 0x00;
     uint8_t b = 0x00;
@@ -25,7 +25,7 @@ static uint16_t score_color_converter(int stress)
     return ((r << 11) | (g << 5) | b);
 }
 
-int display_draw_cartesian( stylistics *styling)
+int display_draw_cartesian(stylistics *styling)
 {
     displayDrawLine(&display, DISPLAY_WIDTH / 2, styling->y_outer_offset, DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - (styling->y_outer_offset), RGB_BLACK);
     displayDrawLine(&display, styling->x_outer_offset, DISPLAY_HEIGHT / 2, DISPLAY_WIDTH - (styling->x_outer_offset), DISPLAY_HEIGHT / 2, RGB_BLACK);
@@ -61,7 +61,8 @@ int display_update_matrix_at_location(matrix *alg_matrix, size_t row, size_t col
         color = curr_color;
     }
 
-    displayDrawRect(&display, col * rw, row * rh, (col + 1) * rw, (row + 1) * rh, color);
+    displayDrawFillRect(&display, col * rw, row * rh, ((col + 1) * rw) - 1, ((row + 1) * rh) - 1, color);
+    displayDrawRect(&display, col * rw, row * rh, ((col + 1) * rw) - 1, ((row + 1) * rh) - 1, RGB_RED);
 }
 
 int display_draw_matrix(matrix *alg_matrix)
@@ -69,14 +70,14 @@ int display_draw_matrix(matrix *alg_matrix)
 
     for (int i = 0; i < MATRIX_SIZE; i++)
     { // col
-        for (int j = 0; i < MATRIX_SIZE; j++)
+        for (int j = 0; j < MATRIX_SIZE; j++)
         { // row
             display_update_matrix_at_location(alg_matrix, j, i);
         }
     }
 }
 
-int display_string_on_display( char *val1, char *val2, char *val3, char *val4,
+int display_string_on_display(char *val1, char *val2, char *val3, char *val4,
                               stylistics *styling)
 {
     displayDrawString(&display, styling->fx, styling->x_outer_offset + styling->x_inner_offset, styling->y_inner_offset + styling->y_outer_offset, val1, RGB_BLACK);
