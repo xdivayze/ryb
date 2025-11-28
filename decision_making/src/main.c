@@ -1,29 +1,16 @@
 #include <libpynq.h>
 #include <pthread.h>
-#include <data_buffer.h>
-#include <data_read.h>
-#include <data_writer.h>
-#include <data_processor.h>
+#include "data_buffer.h"
+#include "data_read.h"
+#include "data_writer.h"
+#include "display_ops.h"
+#include "data_processor.h"
 
 #define GLOBAL_DATA_BUFFER_IN_CAPACITY 10
 #define GLOBAL_DATA_BUFFER_IN_ARRAY_LENGTH 2
 
 #define GLOBAL_DATA_BUFFER_OUT_CAPACITY 2
 #define GLOBAL_DATA_BUFFER_OUT_ARRAY_LENGTH 2
-
-#define IIC_SCL_PIN IO_AR0
-#define IIC_SDA_PIN IO_AR1
-#define IIC_INDEX IIC0
-
-#define HEARTBEAT_IIC_ADDRESS 0x60
-#define HEARTBEAT_IIC_DATA_REGISTER 0
-#define HEARTBEAT_BUFFER_POS 0
-#define BYTES_HEARTBEAT_DATA_SIZE 1
-
-#define CRYING_IIC_ADDRESS 0x47
-#define CRYING_IIC_DATA_REGISTER 0
-#define CRYING_BUFFER_POS 1
-#define BYTES_CRYING_DATA_SIZE 1
 
 #define UART_INDEX UART0
 #define UART_TX IO_AR3
@@ -34,6 +21,8 @@
 #define PROCESSOR_SLEEP_DURATION 200
 
 #define FONT_PATH "/home/student/ryb/fonts/ILGH16XB.FNT"
+
+display_t display;
 
 int main()
 {
@@ -73,7 +62,7 @@ int main()
 
     // INITIALIZE DATA PROCESSING THREAD
 
-    display_t display;
+    
     display_init(&display);
 
     displayFillScreen(&display, RGB_WHITE);

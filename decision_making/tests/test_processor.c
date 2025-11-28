@@ -3,10 +3,11 @@
 #include <pthread.h>
 #include <data_processor.h>
 
+display_t display;
+
 void test_processor(void)
 {
     pynq_init();
-    display_t display;
     display_init(&display);
 
     displayFillScreen(&display, RGB_WHITE);

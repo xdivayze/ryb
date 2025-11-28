@@ -42,7 +42,7 @@ submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_regis
 
 int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_duration, DataBuffer *db, pthread_mutex_t *mutex, iic_index_t iic)
 {
-    for (int i = 0; i < db->array_len; i++)
+    for (int i = 0; i < db->array_len; i++) // ACK loop
     {
         submodule_iic_map *iic_map_curr = iic_map[i];
 
@@ -70,24 +70,38 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
             submodule_iic_map *iic_map_curr = iic_map[i];
 
-            if (db->array_len < iic_map_curr->buffer_array_position)
+            if (db->array_len < iic_map_curr->buffer_array_position) // check if OOB array position
             {
                 free(val);
                 return -4;
             }
 
+            val[i] = 0; // initialize 0
+
+            uint8_t data_ready = 0;
+
+            if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register + 1, &data_ready, 1)) // data_ready check
+            {
+                read_status = -1;
+                continue;
+            }
+            else
+                read_status = 0;
+            if (!data_ready)
+                continue;
+
             uint32_t data = 0;
             size_t data_size = sizeof(data);
             if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register, (uint8_t *)&data, data_size))
-
             {
 
                 read_status = -1;
             }
             else
             {
+                read_status = 0;
                 // fprintf(stdout, "read: 0x%08X\n", data);
-                val[iic_map_curr->buffer_array_position] = (uint8_t)(data & 0xFF);
+                val[iic_map_curr->buffer_array_position] = (uint8_t)(data & 0xFF); // only if data was able to be read and ready
             }
         }
 

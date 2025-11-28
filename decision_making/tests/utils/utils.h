@@ -8,8 +8,8 @@
 
 typedef struct
 {
-    iic_index_t IIC_INDEX;
-    uint8_t IIC_ADDR;
+    iic_index_t iic_index;
+    uint8_t iic_addr;
     uint32_t data_to_send;
     uint8_t register_to_write;
 } writer_args;

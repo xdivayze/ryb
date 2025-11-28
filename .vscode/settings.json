@@ -9,7 +9,8 @@
         "data_writer.h": "c",
         "data_read.h": "c",
         "pthread.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "display_ops.h": "c"
     },
     "makefile.makefilePath": "${workspaceFolder}/decision_making/Makefile"
 }

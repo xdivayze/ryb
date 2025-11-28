@@ -28,8 +28,8 @@ void test_read_data(void)
 
     writer_args *w_args = malloc(sizeof(writer_args));
     w_args->data_to_send = DATA_TO_SEND;
-    w_args->IIC_ADDR = SLAVE_IIC_ADDR;
-    w_args->IIC_INDEX = SLAVE_IIC_INDEX;
+    w_args->iic_addr = SLAVE_IIC_ADDR;
+    w_args->iic_index = SLAVE_IIC_INDEX;
     w_args->register_to_write = 0;
 
     pthread_t slave;

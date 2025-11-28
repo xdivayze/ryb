@@ -45,7 +45,7 @@ void test_tile_detection(void)
     initialize_matrix_data(5);
 
     int scores[] = {-1, -1, -1, -1};
-    tile *initial_tile = new_tile(4, 4, &(scores[0])); // initialize the max stress tile
+    tile *initial_tile = new_tile(4, 4, &(scores[0]), MAX_STRESS); // initialize the max stress tile
     insert_tile_into_matrix(initial_tile, false);
 
     tile *curr_tile = initial_tile;

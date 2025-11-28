@@ -8,6 +8,22 @@
 
 #define PYNQ_MAX_REGISTER 32
 
+#define IIC_SCL_PIN IO_AR0
+#define IIC_SDA_PIN IO_AR1
+#define IIC_INDEX IIC0
+
+#define HEARTBEAT_IIC_ADDRESS 0x60
+#define HEARTBEAT_IIC_DATA_REGISTER 0
+#define HEARTBEAT_IIC_DATA_READY_REGISTER 1
+#define HEARTBEAT_BUFFER_POS 0
+#define BYTES_HEARTBEAT_DATA_SIZE 1
+
+#define CRYING_IIC_ADDRESS 0x47
+#define CRYING_IIC_DATA_REGISTER 0
+#define CRYING_IIC_DATA_READY_REGISTER 1
+#define CRYING_BUFFER_POS 1
+#define BYTES_CRYING_DATA_SIZE 1
+
 typedef struct
 {
     io_t iic_data_pin;
@@ -31,7 +47,7 @@ void stop_i2c_reader(void);
 
 submodule_iic_map *create_submodule_iic_map(io_t iic_data_pin, size_t read_register, size_t buffer_array_position, size_t data_size, size_t addr);
 
-void* call_read_from_iic_to_databuffer_fromargs(void *args);
+void *call_read_from_iic_to_databuffer_fromargs(void *args);
 
 // constantly read from iic and write to respective buffer positions
 // sending iic_map array longer than buffer's array will result in a sigsegv

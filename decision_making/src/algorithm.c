@@ -14,6 +14,10 @@ static matrix algorithm_matrix = {
     .label_cols = (float *)&(FREQUENCIES[0]),
     .label_rows = (int *)&(AMPLITUDES[0])};
 
+matrix* get_matrix() {
+    return &algorithm_matrix;
+}
+
 tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by program
 {
 
@@ -70,7 +74,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] + 1, scores);
+                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] + 1, scores, -1);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
                 {
@@ -119,7 +123,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0] - 1, curr_tile->location[1], scores);
+                tile *newly_generated_tile = new_tile(curr_tile->location[0] - 1, curr_tile->location[1], scores, -1);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
                 {
@@ -170,7 +174,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] - 1, scores);
+                tile *newly_generated_tile = new_tile(curr_tile->location[0], curr_tile->location[1] - 1, scores, -1);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
                 {
@@ -222,7 +226,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
             else
             {
                 // initialize new tile with -1 relative score to the left and update alt_tile do not touch the high_score
-                tile *newly_generated_tile = new_tile(curr_tile->location[0] + 1, curr_tile->location[1], scores);
+                tile *newly_generated_tile = new_tile(curr_tile->location[0] + 1, curr_tile->location[1], scores, -1);
                 insert_tile_into_matrix(newly_generated_tile, false);
                 if (!alt_tile || highest_score == 1) // update alternative tile to the unknown tile if no higher score or alternative tile exists
                 {
@@ -250,7 +254,7 @@ void get_tile_output_values(tile *curr_tile, float *out_arr)
     return;
 }
 // loc0 row; loc1 col
-tile *new_tile(size_t loc0, size_t loc1, int *scores)
+tile *new_tile(size_t loc0, size_t loc1, int *scores, int stress)
 {
     size_t *loc_arr = malloc(sizeof(size_t) * 2);
     loc_arr[0] = loc0;
@@ -269,6 +273,7 @@ tile *new_tile(size_t loc0, size_t loc1, int *scores)
     tile *new_tile = malloc(sizeof(tile));
     new_tile->scores = score_arr;
     new_tile->location = loc_arr;
+    new_tile->stress = stress;
 
     return new_tile;
 }
@@ -304,13 +309,14 @@ void free_matrix()
 }
 
 // checks for only crying data if provided valid range.
-float get_stress_level(int heartbeat, int crying)
+// -1 if invalid range
+int get_stress_level(int heartbeat, int crying)
 {
     if (crying < 100 && crying >= 0)
     { // crying data only valid between open interval (100,0) where stres is (0,50)
         float m = (50.0f - 10.0f) / 100.0f;
         float c = 10.0f;
-        return (m * crying) + c; // linear interpolation
+        return (int) (m * crying) + c; // linear interpolation
     }
 
     if (heartbeat <= 60 || heartbeat > 240)
@@ -319,5 +325,5 @@ float get_stress_level(int heartbeat, int crying)
     float m = (100.0f - 10.0f) / (240.0f - 60.0f);
     float c = -20.0f;
 
-    return ((m * heartbeat) + c); // linear interpolation
+    return (int) ((m * heartbeat) + c); // linear interpolation
 }
