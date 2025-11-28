@@ -46,7 +46,7 @@ int display_draw_cartesian(stylistics *styling)
 
 int display_update_matrix_at_location(matrix *alg_matrix, size_t row, size_t col)
 {
-    uint16_t color = RGB_WHITE;
+    uint16_t color = RGB_GRAY;
     tile *curr_tile = alg_matrix->data[col][row];
     if (curr_tile)
     {
