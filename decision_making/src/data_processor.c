@@ -82,6 +82,12 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     while (keep_running) // algorithm loop
     {
 
+        if (stress > last_stress)
+        {
+            fprintf(stdout, "panic jump occured\n");
+            curr_tile = initial_tile; // panic jump
+        }
+
         if (db_in->count == 0)
         {
             sleep_msec(msec_sleep);
@@ -94,14 +100,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         last_stress = stress;
 
-        stress = get_stress_level(val[0], val[1]); //TODO handle stress -1
+        stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
         curr_tile->stress = stress;
 
-        if (last_stress != initial_stress && stress == initial_stress)
-        {
-            fprintf(stdout, "panic jump occured\n");
-            curr_tile = initial_tile; // panic jump
-        }
+        display_update_matrix_at_location(alg_matrix, curr_tile->location[0], curr_tile->location[1]);
 
         curr_tile = determine_next_tile(curr_tile, &relativity);
         get_tile_output_values(curr_tile, out_arr);
