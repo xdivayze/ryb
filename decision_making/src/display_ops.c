@@ -47,7 +47,7 @@ int display_draw_cartesian(stylistics *styling)
 int move_cursor(matrix *alg_matrix, size_t row_old, size_t col_old, size_t row, size_t col)
 {
     display_update_matrix_at_location(alg_matrix, row_old, col_old);
-    displayDrawFillCircle(&display, row * rw + (int)(rw / 2), 4 * col + (int)(rh / 2), 10, RGB_YELLOW);
+    displayDrawFillCircle(&display, col * rw + (int)(rw / 2), row * rw + (int)(rh / 2), 10, RGB_YELLOW);
 }
 int initialize_cursor(matrix *alg_matrix)
 {

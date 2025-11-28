@@ -124,10 +124,9 @@ void test_tile_detection_with_display(void)
     int relativity = -1;
 
     struct timespec ts;
-    ts.tv_nsec = 500 * 1000 * 1000;
-    ts.tv_sec = 500 / 1000;
+    ts.tv_nsec = 200 * 1000 * 1000;
+    ts.tv_sec = 200 / 1000;
 
-    
     displayFillScreen(&display, RGB_WHITE);
 
     matrix *alg_matrix = get_matrix();
@@ -140,7 +139,9 @@ void test_tile_detection_with_display(void)
         if (current_stress > last_stress)
         {
             printf("panic jump\n");
+            last_tile = curr_tile;
             curr_tile = initial_tile; // panic jump
+            move_cursor(alg_matrix, last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
         }
 
         last_tile = curr_tile;
@@ -162,7 +163,7 @@ void test_tile_detection_with_display(void)
 
         if ((current_stress == last_stress) && (last_stress == 1))
         {
-            displayFillScreen(&display, RGB_WHITE);
+            // displayFillScreen(&display, RGB_WHITE);
             TEST_PASS();
             break;
         }
