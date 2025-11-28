@@ -24,6 +24,9 @@ typedef struct
 
 extern display_t display;
 
+int move_cursor(matrix* alg_matrix, size_t row_old, size_t col_old, size_t row, size_t col);
+int initialize_cursor(matrix* alg_matrix);
+
 int display_string_on_display( char *val1, char *val2, char *val3, char *val4,
                               stylistics *styling);
 int display_draw_cartesian( stylistics *styling);

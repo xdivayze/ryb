@@ -133,6 +133,7 @@ void test_tile_detection_with_display(void)
     matrix *alg_matrix = get_matrix();
 
     display_draw_matrix(alg_matrix);
+    initialize_cursor(alg_matrix);
 
     while (keep_running)
     {
@@ -155,6 +156,7 @@ void test_tile_detection_with_display(void)
         curr_tile->stress = current_stress;
 
         display_update_matrix_at_location(alg_matrix, curr_tile->location[0], curr_tile->location[1]);
+        move_cursor(alg_matrix, last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
 
         printf("last stress: %i; current stress: %i;\n current tile location: r:%li c:%li; last tile location: r:%li c:%li;\n", last_stress, current_stress, curr_tile->location[0], curr_tile->location[1], last_tile->location[0], last_tile->location[1]);
 

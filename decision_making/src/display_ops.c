@@ -44,6 +44,16 @@ int display_draw_cartesian(stylistics *styling)
     return 0;
 }
 
+int move_cursor(matrix *alg_matrix, size_t row_old, size_t col_old, size_t row, size_t col)
+{
+    display_update_matrix_at_location(alg_matrix, row_old, col_old);
+    displayDrawFillCircle(&display, row * rw + (int)(rw / 2), 4 * col + (int)(rh / 2), 10, RGB_YELLOW);
+}
+int initialize_cursor(matrix *alg_matrix)
+{
+    displayDrawFillCircle(&display, 4 * rw + (int)(rw / 2), 4 * rh + (int)(rh / 2), 10, RGB_YELLOW);
+}
+
 int display_update_matrix_at_location(matrix *alg_matrix, size_t row, size_t col)
 {
     uint16_t color = RGB_GRAY;
