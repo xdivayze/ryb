@@ -62,7 +62,6 @@ int main()
 
     // INITIALIZE DATA PROCESSING THREAD
 
-    
     display_init(&display);
 
     displayFillScreen(&display, RGB_WHITE);
@@ -100,7 +99,7 @@ int main()
     w_args->buffer = databuffer_out;
     w_args->mutex = &buffer_out_mutex;
     w_args->sleep_duration_msec = 200;
-    w_args ->uart_index = UART_INDEX;
+    w_args->uart_index = UART_INDEX;
 
     pthread_t writer;
     pthread_create(&writer, NULL, uart_writer_fromargs, w_args);
@@ -109,7 +108,8 @@ int main()
     pthread_join(writer, NULL);
     pthread_join(processor, NULL);
 
-    
+    displayFillScreen(&display, RGB_WHITE);
+    fprintf(stdout, "Closed display\n");
 
     pynq_destroy();
 

@@ -2,14 +2,12 @@
 #include <data_buffer.h>
 #include <pthread.h>
 #include <data_processor.h>
-
-display_t display;
+#include "utils.h"
 
 void test_processor(void)
 {
     pynq_init();
-    display_init(&display);
-
+    initialize_display();
     displayFillScreen(&display, RGB_WHITE);
 
     DataBuffer *db_in = databuffer_create(10, 2);

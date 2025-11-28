@@ -117,8 +117,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         sleep_msec(msec_sleep); // sleep needed for proper
     }
-    displayFillScreen(display, RGB_WHITE);
-    fprintf(stdout, "Closed display\n");
+    
     free(val);
     return 0;
 }

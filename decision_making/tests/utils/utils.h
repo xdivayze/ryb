@@ -23,7 +23,7 @@ typedef struct
 
 void stop_i2c_writer(void);
 void stop_uart_reader(void);
-
+void initialize_display();
 void *i2c_writer(void *args);
 void *uart_reader(void *args);
 

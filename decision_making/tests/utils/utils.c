@@ -3,6 +3,16 @@
 
 static volatile int keep_running = 1;
 
+display_t display;
+
+static int display_initialized = 0;
+
+void initialize_display() {
+    if (!display_initialized) {
+        display_init(&display);
+    }
+}
+
 void stop_i2c_writer(void)
 {
     keep_running = 0;
