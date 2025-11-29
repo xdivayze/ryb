@@ -43,7 +43,7 @@ int display_draw_cartesian(stylistics *styling)
 
     return 0;
 }
-
+//move cursor + update tile in matrix
 int move_cursor(matrix *alg_matrix, size_t row_old, size_t col_old, size_t row, size_t col)
 {
     display_update_matrix_at_location(alg_matrix, row_old, col_old);

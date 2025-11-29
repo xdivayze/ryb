@@ -60,6 +60,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
     }
 
     uint8_t *val = malloc(db->array_len); // array which will be pushed to the buffer
+    uint8_t data_ready = 0;
     while (keep_running)
     {
 
@@ -78,7 +79,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
             val[i] = 0; // initialize 0
 
-            uint8_t data_ready = 0;
+            
 
             if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register + 1, &data_ready, 1)) // data_ready check
             {
@@ -102,6 +103,8 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
                 read_status = 0;
                 // fprintf(stdout, "read: 0x%08X\n", data);
                 val[iic_map_curr->buffer_array_position] = (uint8_t)(data & 0xFF); // only if data was able to be read and ready
+                data_ready = 0;
+                iic_write_register(iic, iic_map_curr->addr, iic_map_curr->read_register+1, &data_ready, 1);
             }
         }
 

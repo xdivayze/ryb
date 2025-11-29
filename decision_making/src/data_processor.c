@@ -74,19 +74,15 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     insert_tile_into_matrix(initial_tile, false);
 
     tile *curr_tile = initial_tile;
+    tile *last_tile = initial_tile;
 
     matrix *alg_matrix = get_matrix();
 
     display_draw_matrix(alg_matrix);
+    initialize_cursor(alg_matrix);
 
     while (keep_running) // algorithm loop
     {
-
-        if (stress > last_stress)
-        {
-            fprintf(stdout, "panic jump occured\n");
-            curr_tile = initial_tile; // panic jump
-        }
 
         if (db_in->count == 0)
         {
@@ -103,9 +99,29 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
         curr_tile->stress = stress;
 
-        display_update_matrix_at_location(alg_matrix, curr_tile->location[0], curr_tile->location[1]);
+        if (stress < last_stress)
+        {
+            curr_tile->scores[relativity]->data = 2;
+        }
+        else if (stress == last_stress)
+        {
+            curr_tile->scores[relativity]->data = 1;
+        }
+        else if (stress > last_stress) //panic jump
+        {
+            curr_tile->scores[relativity]->data = 0;
+            fprintf(stdout, "panic jump occured\n");
+            last_tile = curr_tile;
+            curr_tile = initial_tile;
+            move_cursor(alg_matrix, last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
+        }
 
+        last_tile = curr_tile;
         curr_tile = determine_next_tile(curr_tile, &relativity);
+
+        // move the cursor to the next tile, update the old tile
+        move_cursor(alg_matrix, last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
+
         get_tile_output_values(curr_tile, out_arr);
 
         vals_out[0] = (uint8_t)(out_arr[0] * 100);
@@ -117,7 +133,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         sleep_msec(msec_sleep); // sleep needed for proper
     }
-    
+
     free(val);
     return 0;
 }
