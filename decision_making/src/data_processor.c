@@ -101,14 +101,15 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         curr_tile->stress = stress;
         fprintf(stdout, "r:%li c:%li heartbeat:%i crying:%i stress: %i\n", curr_tile->location[0], curr_tile->location[1], val[0], val[1],stress);
 
-        if (stress == last_stress && stress == 10) {
+        if (stress == last_stress && stress == 20) {
             fprintf(stdout, "baby calmed down\n");
+            stop_processing();
             return 0;
         }
 
         if (stress < last_stress)
         {
-            last_tile->scores[relativity]->data = 2;
+            last_tile->scores[relativity]->data = 0;
             curr_tile->scores[relativity_order_opposites[relativity]]->data = 2;
         }
         else if (stress == last_stress)
@@ -118,11 +119,12 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         }
         else if (stress > last_stress) //panic jump
         {
-            last_tile->scores[relativity]->data = 0;
+            last_tile->scores[relativity]->data = 2;
             curr_tile->scores[relativity_order_opposites[relativity]]->data = 0;
             fprintf(stdout, "panic jump occured\n");
             last_tile = curr_tile;
             curr_tile = initial_tile;
+            stress = initial_stress;
             move_cursor(alg_matrix, last_tile->location[0], last_tile->location[1], curr_tile->location[0], curr_tile->location[1]);
         }
 

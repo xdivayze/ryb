@@ -73,7 +73,7 @@ void test_processor(void)
     struct data_process_args processor_args = {
         .db_in = db_in,
         .db_out = db_out,
-        .msec_sleep = BABY_REACTION_DELAY_MSEC + 100,
+        .msec_sleep = BABY_REACTION_DELAY_MSEC * 2,
         .mutex_in_buffer = &mutex_in,
         .mutex_out_buffer = &mutex_out,
     };
@@ -82,10 +82,7 @@ void test_processor(void)
     pthread_create(&processor_thread, NULL, start_data_process, &processor_args);
 
     pthread_join(processor_thread, NULL);
-    pthread_join(baby_thread, NULL);
-    
 
-    stop_processing();
     keep_baby_mock_running = 0;
 
 

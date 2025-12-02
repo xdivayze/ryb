@@ -97,10 +97,9 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
 
         dstress = (last_stress - stress) / 10;
 
-        if ((dstress == 0) && (stress == 10))
+        if ((dstress == 0) && (stress == 20))
         {
             fprintf(stdout, "i am calmed down\n");
-            return;
         }
 
         if (dstress < 0 || dstress > 1)
