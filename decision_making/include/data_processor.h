@@ -13,8 +13,6 @@
 
 void stop_processing(void);
 
-
-
 typedef struct
 {
     pthread_mutex_t *mutex_in_buffer;
@@ -28,9 +26,7 @@ typedef struct
 
 void *call_data_process_fromargs(void *args);
 
-
-
-//return -1 if initial stat values are not within range
-int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out, size_t msec_sleep, display_t *display, stylistics *styling);
-
+// return -1 if initial stat values are not within range
+int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
+                 size_t msec_sleep);
 #endif

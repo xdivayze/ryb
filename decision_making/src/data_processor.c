@@ -28,11 +28,11 @@ void *call_data_process_fromargs(void *args)
 {
     data_process_args *dp_args = (data_process_args *)args;
 
-    return (void *)data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep, dp_args->display, dp_args->styling);
+    return (void *)data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep);
 }
 
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
-                 size_t msec_sleep, display_t *display, stylistics *styling)
+                 size_t msec_sleep)
 {
     uint8_t *val = malloc(sizeof(uint8_t) * db_in->array_len);     // 0: heartbeat 1: crying
     uint8_t *val_old = malloc(sizeof(uint8_t) * db_in->array_len); // 0: heartbeat 1: crying
@@ -98,6 +98,11 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
         curr_tile->stress = stress;
+
+        if (stress == last_stress && stress == 10) {
+            fprintf(stdout, "baby calmed down\n");
+            return 0;
+        }
 
         if (stress < last_stress)
         {

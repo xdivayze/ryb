@@ -72,5 +72,5 @@ void test_baby_mock_check_bare_values(void)
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY_MESSAGE(initial_vitals, vital_values, 2, "vital assertion at initial motor moves failed");
 
-
+    keep_baby_mock_running = 0;
 }
