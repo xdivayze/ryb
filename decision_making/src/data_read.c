@@ -77,7 +77,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
                 return -4;
             }
 
-            val[i] = 0; // initialize 0
+            val[i] = 0xFF; // initialize OOB for stress calculation
 
             
 

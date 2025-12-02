@@ -6,7 +6,7 @@
 static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
 static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
 
-char relativity_order_opposites[] = {2,3,0,1};
+char relativity_order_opposites[] = {2, 3, 0, 1};
 char relativity_order_actual[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_LEFT, RELATIVITY_BOTTOM};
 
 static matrix algorithm_matrix = {
@@ -14,14 +14,16 @@ static matrix algorithm_matrix = {
     .label_cols = (float *)&(FREQUENCIES[0]),
     .label_rows = (int *)&(AMPLITUDES[0])};
 
-matrix* get_matrix() {
+matrix *get_matrix()
+{
     return &algorithm_matrix;
 }
 
 tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by program
 {
 
-    if ((curr_tile->location[0] == curr_tile->location[1]) && (curr_tile->location[0] == 0)) {
+    if ((curr_tile->location[0] == curr_tile->location[1]) && (curr_tile->location[0] == 0))
+    {
         return curr_tile;
     }
 
@@ -265,7 +267,7 @@ tile *new_tile(size_t loc0, size_t loc1, int *scores, int stress)
     for (int i = 0; i < 4; i++)
     {
         score *new_score_obj = malloc(sizeof(score));
-        new_score_obj->data= scores[i];
+        new_score_obj->data = scores[i];
         new_score_obj->relativity = relativity_order_actual[i];
         score_arr[i] = new_score_obj;
     }
@@ -313,17 +315,17 @@ void free_matrix()
 int get_stress_level(int heartbeat, int crying)
 {
     if (crying < 100 && crying >= 0)
-    { // crying data only valid between open interval (100,0) where stres is (0,50)
+    { // crying data only valid in interval (100,0] where stres is [10,50)
         float m = (50.0f - 10.0f) / 100.0f;
         float c = 10.0f;
-        return (int) (m * crying) + c; // linear interpolation
+        return (int)(m * crying) + c; // linear interpolation
     }
 
-    if (heartbeat <= 60 || heartbeat > 240)
+    if (heartbeat < 60 || heartbeat > 240)
         return -1; //-1 if no data is in valid range
 
     float m = (100.0f - 10.0f) / (240.0f - 60.0f);
     float c = -20.0f;
 
-    return (int) ((m * heartbeat) + c); // linear interpolation
+    return (int)((m * heartbeat) + c); // linear interpolation
 }

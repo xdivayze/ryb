@@ -36,15 +36,14 @@ int max_stress = 9;
 void test_stress_calculation(void)
 {
     int crying = 80;
-    int stress = 42;
 
-    TEST_ASSERT_EQUAL_INT_MESSAGE(stress, get_stress_level(2000, crying), "error calculating from crying");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(42, get_stress_level(2000, crying), "error calculating from crying");
 
     crying = 100;
     int heartbeat = 200;
-    stress = 80;
 
-    TEST_ASSERT_EQUAL_INT_MESSAGE(stress, get_stress_level(heartbeat, crying), "error calculating from heartbeat");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(80, get_stress_level(heartbeat, crying), "error calculating from heartbeat");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(-1, get_stress_level(0xFF, 0xFF), "stress calculation did not fail for OOB values");
 }
 
 void test_tile_detection(void)

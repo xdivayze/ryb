@@ -18,6 +18,26 @@ static int test_matrix[5][5] = {
 static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
 static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
 
+int crying_from_stress(int stress)
+{
+    if (stress < 0 || stress > 100)
+        return -1;
+    if (stress <= 10)
+        return 0;
+    if (stress >= 50)
+        return 100;
+    return (int)((10.0f / 4.0f) * (stress - 10));
+}
+
+int heartbeat_from_stress(int stress)
+{
+    if (stress < 0 || stress > 100)
+        return -1;
+    if (stress <= 10)
+        return 60;
+    return (2 * stress + 40);
+}
+
 void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *db_out, pthread_mutex_t *mutex_out)
 {
     struct timespec ts;
@@ -44,7 +64,7 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
         }
 
         pthread_mutex_lock(mutex_in);
-        databuffer_pop(db_in, &vals_in);
+        databuffer_pop(db_in, vals_in);
         pthread_mutex_unlock(mutex_in);
 
         column = -1;
@@ -68,7 +88,7 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
         }
 
         last_stress = stress;
-        stress = test_matrix[column][row];
+        stress = test_matrix[column][row] * 10 + 10;
 
         dstress = stress - last_stress;
 
@@ -84,7 +104,7 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
         }
 
         pthread_mutex_lock(mutex_out);
-        databuffer_push(db_out, &vals_out);
+        databuffer_push(vals_out, db_out );
         pthread_mutex_unlock(mutex_out);
 
         nanosleep(&ts, NULL);

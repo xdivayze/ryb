@@ -57,7 +57,7 @@ UTILS_DIR := $(TEST_DIR)/utils
 
 TEST_RUNNER := $(TEST_DIR)/test_runner.c
 TEST_CASES  := $(filter-out $(TEST_RUNNER), $(wildcard $(TEST_DIR)/*.c))
-TEST_SRC    := $(TEST_RUNNER) $(TEST_CASES) $(UNITY_DIR)/unity.c $(UTILS_DIR)/utils.c
+TEST_SRC    := $(TEST_RUNNER) $(TEST_CASES) $(UNITY_DIR)/unity.c $(UTILS_DIR)/utils.c $(UTILS_DIR)/baby_mock.c 
 TEST_BIN := bin/tests/run_tests
 
 
