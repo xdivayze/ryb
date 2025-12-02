@@ -11,6 +11,8 @@ void test_tile_detection(void);
 void test_tile_detection_with_display(void);
 void test_heartbeat_from_stress(void);
 void test_crying_from_stress(void);
+void test_baby_mock_check_bare_values(void);
+
 
 void setUp(void)
 {
@@ -36,6 +38,8 @@ int main(void)
     
     // RUN_TEST(test_tile_detection);
     // RUN_TEST(test_tile_detection_with_display);
+
+    RUN_TEST(test_baby_mock_check_bare_values);
 
     return UNITY_END();
 }

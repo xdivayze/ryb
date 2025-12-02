@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <stdio.h>
-static volatile int keep_running = 1;
 
 static int test_matrix[5][5] = {
 
@@ -15,8 +14,8 @@ static int test_matrix[5][5] = {
     {7, 6, 6, 7, 8},
     {9, 9, 9, 9, 9}};
 
-static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
-static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
+static const float FREQUENCIES[5] = {20, 35, 50, 65, 70}; // Hz
+static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};   //%, dimensionless
 
 int crying_from_stress(int stress)
 {
@@ -38,7 +37,7 @@ int heartbeat_from_stress(int stress)
     return (2 * stress + 40);
 }
 
-void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *db_out, pthread_mutex_t *mutex_out)
+void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *db_out, pthread_mutex_t *mutex_out, int initial_stress)
 {
     struct timespec ts;
     ts.tv_nsec = BABY_REACTION_DELAY_MSEC * 1000 * 1000;
@@ -47,7 +46,6 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
     uint8_t vals_in[2] = {0};  // freq, amplitude values
     uint8_t vals_out[2] = {0}; // heartbeat, crying values
 
-    int initial_stress = 9;
     int stress = initial_stress;
     int last_stress = stress;
     int row = 0;
@@ -55,7 +53,7 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
 
     int dstress = 0;
 
-    while (keep_running)
+    while (keep_baby_mock_running)
     {
         if (db_in->count == 0)
         {
@@ -82,15 +80,15 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
             }
         }
 
-        if (column == -1 || row == -1)
+        if ((column == -1) || (row == -1))
         {
-            fprintf(stderr, "incompatible frequency or amplitude value");
+            fprintf(stderr, "incompatible frequency or amplitude value\n");
         }
 
         last_stress = stress;
         stress = test_matrix[column][row] * 10 + 10;
 
-        dstress = stress - last_stress;
+        dstress = (last_stress - stress) / 10;
 
         if (dstress < 0 || dstress > 1)
         { // panic jump if too low stress tile or higher stress tile
@@ -99,12 +97,12 @@ void start_baby_loop(DataBuffer *db_in, pthread_mutex_t *mutex_in, DataBuffer *d
         }
         else
         {
-            vals_out[0] = heartbeat_from_stress(stress * 10 + 10);
-            vals_out[1] == crying_from_stress(stress * 10 + 10);
+            vals_out[0] = heartbeat_from_stress(stress);
+            vals_out[1] = crying_from_stress(stress);
         }
 
         pthread_mutex_lock(mutex_out);
-        databuffer_push(vals_out, db_out );
+        databuffer_push(vals_out, db_out);
         pthread_mutex_unlock(mutex_out);
 
         nanosleep(&ts, NULL);
