@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-static const float FREQUENCIES[5] = {0.2, 0.35, 0.5, 0.65, 0.7}; // Hz
+static const float FREQUENCIES_NON_FLOATING[5] = {20, 35, 50, 65, 70}; // Hz
+static const float FREQUENCIES_FLOATING[5] = {0.2f, 0.35f, 0.5f, 0.65f, 0.7f}; // Hz
+
 static const int AMPLITUDES[5] = {20, 40, 60, 80, 100};          //%, dimensionless
 
 char relativity_order_opposites[] = {2, 3, 0, 1};
@@ -11,7 +13,7 @@ char relativity_order_actual[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_L
 
 static matrix algorithm_matrix = {
     .data = {0, 0, 0, 0, 0}, // dummy data overwritten  by initialization of data
-    .label_cols = (float *)&(FREQUENCIES[0]),
+    .label_cols = (float *)&(FREQUENCIES_NON_FLOATING[0]),
     .label_rows = (int *)&(AMPLITUDES[0])};
 
 matrix *get_matrix()
@@ -251,8 +253,8 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
 
 void get_tile_output_values(tile *curr_tile, float *out_arr)
 {
-    out_arr[0] = AMPLITUDES[curr_tile->location[0]];
-    out_arr[1] = FREQUENCIES[curr_tile->location[1]];
+    out_arr[0] = FREQUENCIES_FLOATING[curr_tile->location[1]];
+    out_arr[1] = AMPLITUDES[curr_tile->location[0]];
     return;
 }
 // loc0 row; loc1 col

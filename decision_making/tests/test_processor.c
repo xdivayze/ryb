@@ -24,6 +24,8 @@ static struct baby_mock_args
     int initial_stress;
 };
 
+
+
 static void *baby_mock_runner(void *args)
 {
     struct baby_mock_args *baby_args = (struct baby_mock_args *)args;
@@ -43,6 +45,7 @@ static void *start_data_process(void *args)
 
 void test_processor(void)
 {
+    max_stress = 100;
     pynq_init();
     initialize_display();
     displayFillScreen(&display, RGB_WHITE);
@@ -70,7 +73,7 @@ void test_processor(void)
     struct data_process_args processor_args = {
         .db_in = db_in,
         .db_out = db_out,
-        .msec_sleep = BABY_REACTION_DELAY_MSEC - 5,
+        .msec_sleep = BABY_REACTION_DELAY_MSEC + 100,
         .mutex_in_buffer = &mutex_in,
         .mutex_out_buffer = &mutex_out,
     };

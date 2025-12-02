@@ -40,8 +40,8 @@ void test_baby_mock_check_bare_values(void)
 {
 
     struct timespec ts;
-    ts.tv_nsec = BABY_REACTION_DELAY_MSEC * 1000 * 1000;
-    ts.tv_sec = BABY_REACTION_DELAY_MSEC / 1000;
+    ts.tv_nsec = 2*BABY_REACTION_DELAY_MSEC * 1000 * 1000;
+    ts.tv_sec = 2*BABY_REACTION_DELAY_MSEC / 1000;
 
     DataBuffer *db_in = databuffer_create(5, 2);
     pthread_mutex_t mutex_in;

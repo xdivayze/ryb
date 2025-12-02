@@ -18,21 +18,25 @@ uint8_t *databuffer_consume(DataBuffer *databuffer)
 
 int databuffer_push(uint8_t *val, DataBuffer *databuffer)
 {
-
     size_t h = databuffer->head;
 
-    memcpy(&databuffer->data[idx(databuffer, h, 0)], val, databuffer->array_len * sizeof(uint8_t));
+    // write at current head slot
+    memcpy(&databuffer->data[idx(databuffer, h, 0)],
+           val,
+           databuffer->array_len * sizeof(uint8_t));
 
+    // advance head to next slot
     h = (h + 1 == databuffer->buffer_capacity) ? 0 : h + 1;
 
-    if (databuffer->count == databuffer->buffer_capacity)
-    {
-        databuffer->tail = (databuffer->tail + 1 == databuffer->buffer_capacity) ? 0 : databuffer->tail + 1;
-    }
-    else
-    {
+    if (databuffer->count == databuffer->buffer_capacity) {
+        // buffer full: drop the oldest element by advancing tail
+        databuffer->tail = (databuffer->tail + 1 == databuffer->buffer_capacity)
+                               ? 0
+                               : databuffer->tail + 1;
+    } else {
         databuffer->count++;
     }
+
     databuffer->head = h;
 
     return 0;
@@ -41,16 +45,26 @@ int databuffer_push(uint8_t *val, DataBuffer *databuffer)
 int databuffer_pop(DataBuffer *databuffer, uint8_t *out_array)
 {
     if (databuffer->count == 0)
-        return -1;
+        return -1; // empty
 
-    for (size_t j = 0; j < databuffer->array_len; j++)
-    {
-        size_t access_index = idx(databuffer, databuffer->tail, j);
-        out_array[j] = databuffer->data[access_index];
-    }
+    // slot of last pushed element (head points to next free slot)
+    size_t slot = (databuffer->head == 0)
+                      ? databuffer->buffer_capacity - 1
+                      : databuffer->head - 1;
 
-    databuffer->tail = (databuffer->tail + 1) % databuffer->buffer_capacity;
+    // copy out the full array from that slot
+    memcpy(out_array,
+           &databuffer->data[idx(databuffer, slot, 0)],
+           databuffer->array_len * sizeof(uint8_t));
+
+    // move head back to this slot (now becomes next free position)
+    databuffer->head = slot;
     databuffer->count--;
+
+    // optional: keep tail sane when we become empty
+    if (databuffer->count == 0)
+        databuffer->tail = databuffer->head;
+
     return 0;
 }
 

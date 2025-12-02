@@ -29,10 +29,10 @@
             uint8_t* out = malloc(sizeof(uint8_t) * array_len);
             databuffer_pop(db, out);
 
-            uint8_t val[] = {3.0f, 6.0f};
+            uint8_t val[] = {27.0f, 30.0f};
             TEST_ASSERT_EQUAL_UINT8_ARRAY (val, out, array_len);
 
-            TEST_ASSERT_EQUAL_size_t(2, db->tail);
+            TEST_ASSERT_EQUAL_size_t(0, db->head);
         }
         else
             TEST_ASSERT_EQUAL_size_t(i + 1, db->head);

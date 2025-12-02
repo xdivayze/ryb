@@ -2,7 +2,8 @@
 
 #define BABY_MOCK_H
 
-#define BABY_REACTION_DELAY_MSEC 100
+#define BABY_REACTION_DELAY_MSEC 50
+
 
 #include "pthread.h"
 #include "data_buffer.h"

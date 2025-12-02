@@ -46,9 +46,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     {
         pthread_mutex_lock(mutex_in_buffer);
 
-        if (db_in->count == 0)
+        if (db_in->count != 0)
         {
             databuffer_pop(db_in, val);
+            pthread_mutex_unlock(mutex_in_buffer);
             break;
         }
 
@@ -98,6 +99,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
         curr_tile->stress = stress;
+        fprintf(stdout, "r:%li c:%li heartbeat:%i crying:%i stress: %i\n", curr_tile->location[0], curr_tile->location[1], val[0], val[1],stress);
 
         if (stress == last_stress && stress == 10) {
             fprintf(stdout, "baby calmed down\n");
@@ -106,15 +108,18 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         if (stress < last_stress)
         {
-            curr_tile->scores[relativity]->data = 2;
+            last_tile->scores[relativity]->data = 2;
+            curr_tile->scores[relativity_order_opposites[relativity]]->data = 2;
         }
         else if (stress == last_stress)
         {
-            curr_tile->scores[relativity]->data = 1;
+            last_tile->scores[relativity]->data = 1;
+            curr_tile->scores[relativity_order_opposites[relativity]]->data = 1;
         }
         else if (stress > last_stress) //panic jump
         {
-            curr_tile->scores[relativity]->data = 0;
+            last_tile->scores[relativity]->data = 0;
+            curr_tile->scores[relativity_order_opposites[relativity]]->data = 0;
             fprintf(stdout, "panic jump occured\n");
             last_tile = curr_tile;
             curr_tile = initial_tile;
@@ -135,8 +140,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         pthread_mutex_lock(mutex_out_buffer);
         databuffer_push(vals_out, db_out);
         pthread_mutex_unlock(mutex_out_buffer);
-
-        sleep_msec(msec_sleep); // sleep needed for proper
+        sleep_msec(msec_sleep);
     }
 
     free(val);

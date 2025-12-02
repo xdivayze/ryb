@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 
-//FIFO N dimensional byte buffer
+//LIFO N dimensional byte buffer
 typedef struct {
         size_t buffer_capacity; // capacity of the buffer, in number of arrays
     size_t array_len;       // length of each array in the buffer

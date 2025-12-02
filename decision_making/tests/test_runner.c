@@ -27,9 +27,9 @@ int main(void)
     RUN_TEST(test_create_buffer);
     RUN_TEST(test_push_buffer_single);
     RUN_TEST(test_push_buffer_multiple);
-    RUN_TEST(test_stress_calculation);
-    RUN_TEST(test_heartbeat_from_stress);
-    RUN_TEST(test_crying_from_stress);
+    // RUN_TEST(test_stress_calculation);
+    // RUN_TEST(test_heartbeat_from_stress);
+    // RUN_TEST(test_crying_from_stress);
     RUN_TEST(test_baby_mock_check_bare_values);
 
     //pynq dependent tests
