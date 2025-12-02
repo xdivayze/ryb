@@ -99,9 +99,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
         curr_tile->stress = stress;
-        fprintf(stdout, "r:%li c:%li heartbeat:%i crying:%i stress: %i\n", curr_tile->location[0], curr_tile->location[1], val[0], val[1],stress);
+        fprintf(stdout, "r:%li c:%li heartbeat:%i crying:%i stress: %i\n", curr_tile->location[0], curr_tile->location[1], val[0], val[1], stress);
 
-        if (stress == last_stress && stress == 20) {
+        if (stress == last_stress && stress == 20)
+        {
             fprintf(stdout, "baby calmed down\n");
             stop_processing();
             return 0;
@@ -117,7 +118,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
             last_tile->scores[relativity]->data = 1;
             curr_tile->scores[relativity_order_opposites[relativity]]->data = 1;
         }
-        else if (stress > last_stress) //panic jump
+        else if (stress > last_stress) // panic jump
         {
             last_tile->scores[relativity]->data = 2;
             curr_tile->scores[relativity_order_opposites[relativity]]->data = 0;

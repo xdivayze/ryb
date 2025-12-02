@@ -13,7 +13,7 @@ static uint16_t score_color_converter(int stress)
         return -1;
     }
 
-    float alpha = (1.0f / (float)max_stress) * (9 - stress);
+    float alpha = (1.0f / (float)max_stress) * (max_stress - stress);
     uint8_t g = 0x3F;
     uint16_t r = 0x00;
     uint8_t b = 0x00;
