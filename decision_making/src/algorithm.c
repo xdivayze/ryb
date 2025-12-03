@@ -13,7 +13,7 @@ char relativity_order_actual[] = {RELATIVITY_RIGHT, RELATIVITY_TOP, RELATIVITY_L
 
 static matrix algorithm_matrix = {
     .data = {0, 0, 0, 0, 0}, // dummy data overwritten  by initialization of data
-    .label_cols = (float *)&(FREQUENCIES_NON_FLOATING[0]),
+    .label_cols = (float *)&(FREQUENCIES_FLOATING[0]),
     .label_rows = (int *)&(AMPLITUDES[0])};
 
 matrix *get_matrix()

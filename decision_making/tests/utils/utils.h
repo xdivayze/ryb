@@ -20,7 +20,7 @@ typedef struct
     DataBuffer *db_reader;
     pthread_mutex_t *mutex_reader;
 } reader_args;
-
+extern int display_initialized;
 void stop_i2c_writer(void);
 void stop_uart_reader(void);
 void initialize_display();

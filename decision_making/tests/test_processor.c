@@ -4,6 +4,7 @@
 #include <data_processor.h>
 #include "utils.h"
 #include "baby_mock.h"
+#include "unity.h"
 
 
 static struct data_process_args
@@ -91,7 +92,8 @@ void test_processor(void)
 
     keep_baby_mock_running = 0;
 
-
-    display_destroy(&display);
     pynq_destroy();
+    display_initialized = 0;
+
+    TEST_PASS();
 }

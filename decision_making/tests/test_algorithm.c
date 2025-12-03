@@ -48,6 +48,7 @@ void test_stress_calculation(void)
 
 void test_tile_detection(void)
 {
+    max_stress = 9;
     initialize_matrix_data(5);
 
     int scores[] = {-1, -1, -1, -1};
@@ -100,6 +101,7 @@ void test_tile_detection(void)
 
 void test_tile_detection_with_display(void)
 {
+    max_stress = 9;
     pynq_init();
     initialize_display();
 
@@ -171,4 +173,5 @@ void test_tile_detection_with_display(void)
         nanosleep(&ts, NULL);
     }
     pynq_destroy();
+    display_initialized = 0;
 }

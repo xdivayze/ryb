@@ -40,7 +40,7 @@ int main(void)
     RUN_TEST(test_processor);
 
     
-    // RUN_TEST(test_tile_detection_with_display);
+    RUN_TEST(test_tile_detection_with_display);
 
     return UNITY_END();
 }

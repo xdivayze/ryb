@@ -1,8 +1,8 @@
 #include "display_ops.h"
 #include <string.h>
 
-static const int rw = (DISPLAY_WIDTH-20) / 5;
-static const int rh = (DISPLAY_HEIGHT-20) / 5;
+static const int rw = (DISPLAY_WIDTH) / 6;
+static const int rh = (DISPLAY_HEIGHT) / 6;
 
 static uint16_t score_color_converter(int stress)
 {
@@ -88,10 +88,10 @@ int display_draw_matrix(matrix *alg_matrix, FontxFile* font_file)
             
         }
         sprintf(val, "%.2f", alg_matrix->label_cols[i]);
-        displayDrawString(&display, font_file, (i*rw + rw/2), (MATRIX_SIZE*rh + rh/2), val, RGB_BLACK );
+        displayDrawString(&display, font_file, (i*rw), (MATRIX_SIZE*rh + rh/2), val, RGB_BLACK );
 
-        sprintf(val, "%.2f", alg_matrix->label_rows[i]);
-        displayDrawString(&display, font_file,  (MATRIX_SIZE*rw + rw/2),(i*rh + rh/2), val, RGB_BLACK );
+        sprintf(val, "%i", alg_matrix->label_rows[i]);
+        displayDrawString(&display, font_file,  (MATRIX_SIZE*rw),(i*rh + rh/2), val, RGB_BLACK );
     }
 
     

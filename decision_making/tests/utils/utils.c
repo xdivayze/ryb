@@ -5,7 +5,7 @@ static volatile int keep_running = 1;
 
 display_t display;
 
-static int display_initialized = 0;
+int display_initialized = 0;
 
 void initialize_display()
 {
@@ -15,6 +15,8 @@ void initialize_display()
         display_initialized = 1;
     }
 }
+
+
 
 const char *FONT_PATH = "/home/student/ryb/fonts/ILGH16XB.FNT";
 
