@@ -12,9 +12,7 @@ int main()
 
     adc_init();
     
-    while(1) {
-        adc_read_channel_raw(ADC_CHANNEL);
-    }
+    data_process(NULL, NULL, NULL, NULL, 50, NULL, ADC_CHANNEL);
     
     pynq_destroy();
 
