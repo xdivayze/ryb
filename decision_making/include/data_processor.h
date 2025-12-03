@@ -20,13 +20,12 @@ typedef struct
     DataBuffer *db_in;
     DataBuffer *db_out;
     size_t msec_sleep;
-    display_t *display;
-    stylistics *styling;
+    FontxFile* font_file;
 } data_process_args;
 
 void *call_data_process_fromargs(void *args);
 
 // return -1 if initial stat values are not within range
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
-                 size_t msec_sleep);
+                 size_t msec_sleep, FontxFile* font_file);
 #endif

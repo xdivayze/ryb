@@ -48,7 +48,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
         uint8_t d = 0;
         sleep_msec(250);
-        if (iic_write_register(iic, iic_map_curr->addr, 0, &d, 1) == 0)
+        if (iic_write_register(iic, iic_map_curr->addr, 5, &d, 1) == 0)
         {
             fprintf(stdout, "ACK Successful on addr: %d\n", iic_map_curr->addr);
         }
@@ -79,8 +79,6 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
 
             val[i] = 0xFF; // initialize OOB for stress calculation
 
-            
-
             if (iic_read_register(iic, iic_map_curr->addr, iic_map_curr->read_register + 1, &data_ready, 1)) // data_ready check
             {
                 read_status = -1;
@@ -104,7 +102,7 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
                 // fprintf(stdout, "read: 0x%08X\n", data);
                 val[iic_map_curr->buffer_array_position] = (uint8_t)(data & 0xFF); // only if data was able to be read and ready
                 data_ready = 0;
-                iic_write_register(iic, iic_map_curr->addr, iic_map_curr->read_register+1, &data_ready, 1);
+                iic_write_register(iic, iic_map_curr->addr, iic_map_curr->read_register + 1, &data_ready, 1);
             }
         }
 
@@ -113,24 +111,14 @@ int read_from_iic_to_databuffer(submodule_iic_map **iic_map, size_t msec_sleep_d
             sleep_msec(MSEC_SLEEP_ON_TIMEOUT); // wait for i2c bus reset
             continue;
         }
-
-        int status = pthread_mutex_lock(mutex);
-        if (status)
-        {
-            free(val);
-            fprintf(stderr, "error occured while locking mutex status code: %d\n", status);
-            return -2;
+        if ((val[0] == val[1]) && (val[1] == 0xFF)) { //pass if both values were unready, doubt this would happen tho since crying is analog 
+            sleep_msec(msec_sleep_duration);
+            continue;
         }
 
+        pthread_mutex_lock(mutex);
         databuffer_push(val, db);
-
-        status = pthread_mutex_unlock(mutex);
-        if (status)
-        {
-            free(val);
-            fprintf(stderr, "error occured while unlocking mutex status code: %d\n", status);
-            return -2;
-        }
+        pthread_mutex_unlock(mutex);
 
         sleep_msec(msec_sleep_duration);
     }

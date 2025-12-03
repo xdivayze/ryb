@@ -7,12 +7,16 @@ display_t display;
 
 static int display_initialized = 0;
 
-void initialize_display() {
-    if (!display_initialized) {
+void initialize_display()
+{
+    if (!display_initialized)
+    {
         display_init(&display);
         display_initialized = 1;
     }
 }
+
+const char *FONT_PATH = "/home/student/ryb/fonts/ILGH16XB.FNT";
 
 void stop_i2c_writer(void)
 {
@@ -54,7 +58,8 @@ void *uart_reader(void *args)
     uint8_t *vals = malloc(sizeof(uint8_t) * casted_args->db_reader->array_len);
     while (keep_uart_reader_running)
     {
-        if (casted_args->db_reader->count == casted_args->db_reader->buffer_capacity) {
+        if (casted_args->db_reader->count == casted_args->db_reader->buffer_capacity)
+        {
             stop_uart_reader();
         }
 

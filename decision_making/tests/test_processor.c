@@ -13,6 +13,7 @@ static struct data_process_args
     DataBuffer *db_in;
     DataBuffer *db_out;
     size_t msec_sleep;
+    FontxFile *font_file;
 };
 
 static struct baby_mock_args
@@ -38,7 +39,7 @@ static void *baby_mock_runner(void *args)
 static void *start_data_process(void *args)
 {
     struct data_process_args* casted_args = (struct data_process_args*) args;
-    data_process(casted_args->mutex_in_buffer, casted_args->mutex_out_buffer, casted_args->db_in, casted_args->db_out, casted_args->msec_sleep);
+    data_process(casted_args->mutex_in_buffer, casted_args->mutex_out_buffer, casted_args->db_in, casted_args->db_out, casted_args->msec_sleep, casted_args->font_file);
     return NULL;
 }
 
@@ -70,12 +71,17 @@ void test_processor(void)
     pthread_t baby_thread;
     pthread_create(&baby_thread, NULL, baby_mock_runner, &baby_args);
 
+    FontxFile fx16G[2];
+    InitFontx(fx16G, FONT_PATH, "");
+
     struct data_process_args processor_args = {
         .db_in = db_in,
         .db_out = db_out,
         .msec_sleep = BABY_REACTION_DELAY_MSEC * 2,
         .mutex_in_buffer = &mutex_in,
         .mutex_out_buffer = &mutex_out,
+        .font_file = fx16G,
+        
     };
 
     pthread_t processor_thread;

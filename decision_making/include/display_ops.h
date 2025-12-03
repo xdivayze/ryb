@@ -12,6 +12,8 @@
 #define OUT_FREQ_TEXT "OUT1"
 #define OUT_AMPL_TEXT "OUT2"
 
+extern const char* FONT_PATH;
+
 typedef struct
 {
     uint16_t y_inner_offset;
@@ -31,7 +33,7 @@ int display_string_on_display( char *val1, char *val2, char *val3, char *val4,
                               stylistics *styling);
 int display_draw_cartesian( stylistics *styling);
 
-int display_draw_matrix(matrix* alg_matrix);
+int display_draw_matrix(matrix* alg_matrix, FontxFile* font_file);
 
 int display_update_matrix_at_location(matrix* alg_matrix, size_t row, size_t col);
 

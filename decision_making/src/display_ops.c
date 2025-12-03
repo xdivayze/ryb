@@ -1,8 +1,8 @@
 #include "display_ops.h"
 #include <string.h>
 
-static const int rw = DISPLAY_WIDTH / 5;
-static const int rh = DISPLAY_HEIGHT / 5;
+static const int rw = (DISPLAY_WIDTH-20) / 5;
+static const int rh = (DISPLAY_HEIGHT-20) / 5;
 
 static uint16_t score_color_converter(int stress)
 {
@@ -75,17 +75,28 @@ int display_update_matrix_at_location(matrix *alg_matrix, size_t row, size_t col
     displayDrawRect(&display, col * rw, row * rh, ((col + 1) * rw) - 1, ((row + 1) * rh) - 1, RGB_RED);
 }
 
-int display_draw_matrix(matrix *alg_matrix)
+int display_draw_matrix(matrix *alg_matrix, FontxFile* font_file)
 {
+
+    char val[3] = "";
 
     for (int i = 0; i < MATRIX_SIZE; i++)
     { // col
         for (int j = 0; j < MATRIX_SIZE; j++)
         { // row
             display_update_matrix_at_location(alg_matrix, j, i);
+            
         }
+        sprintf(val, "%.2f", alg_matrix->label_cols[i]);
+        displayDrawString(&display, font_file, (i*rw + rw/2), (MATRIX_SIZE*rh + rh/2), val, RGB_BLACK );
+
+        sprintf(val, "%.2f", alg_matrix->label_rows[i]);
+        displayDrawString(&display, font_file,  (MATRIX_SIZE*rw + rw/2),(i*rh + rh/2), val, RGB_BLACK );
     }
+
+    
 }
+
 
 int display_string_on_display(char *val1, char *val2, char *val3, char *val4,
                               stylistics *styling)

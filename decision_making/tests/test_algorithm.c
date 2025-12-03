@@ -129,8 +129,9 @@ void test_tile_detection_with_display(void)
     displayFillScreen(&display, RGB_WHITE);
 
     matrix *alg_matrix = get_matrix();
-
-    display_draw_matrix(alg_matrix);
+    FontxFile fx16G[2];
+    InitFontx(fx16G, FONT_PATH, "");
+    display_draw_matrix(alg_matrix, fx16G);
     initialize_cursor(alg_matrix);
 
     while (keep_running)

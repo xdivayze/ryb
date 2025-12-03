@@ -28,11 +28,11 @@ void *call_data_process_fromargs(void *args)
 {
     data_process_args *dp_args = (data_process_args *)args;
 
-    return (void *)data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep);
+    return (void *)data_process(dp_args->mutex_in_buffer, dp_args->mutex_out_buffer, dp_args->db_in, dp_args->db_out, dp_args->msec_sleep, dp_args->font_file);
 }
 
 int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_buffer, DataBuffer *db_in, DataBuffer *db_out,
-                 size_t msec_sleep)
+                 size_t msec_sleep, FontxFile *font_file)
 {
     uint8_t *val = malloc(sizeof(uint8_t) * db_in->array_len);     // 0: heartbeat 1: crying
     uint8_t *val_old = malloc(sizeof(uint8_t) * db_in->array_len); // 0: heartbeat 1: crying
@@ -41,6 +41,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     float out_arr[] = {0.0f, 0.0f};
     uint8_t vals_out[2] = {0, 0};
+    int stress = 0xFF;
 
     while (1) // initial stress calculation is crucial
     {
@@ -50,20 +51,19 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         {
             databuffer_pop(db_in, val);
             pthread_mutex_unlock(mutex_in_buffer);
-            break;
+            stress = get_stress_level(val[0], val[1]);
+            if (stress == -1)
+            {
+                fprintf(stderr, "initial stress calculation failed, trying again\n");
+                continue;
+            }
+            else
+                break;
         }
 
         pthread_mutex_unlock(mutex_in_buffer);
         sleep_msec(msec_sleep);
     }
-
-    int stress = get_stress_level(val[0], val[1]);
-
-    if (stress == -1)
-    {
-        return -1; // TODO error handling instead of returning
-    }
-
     int relativity;
 
     initial_stress = stress;
@@ -79,8 +79,10 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
     matrix *alg_matrix = get_matrix();
 
-    display_draw_matrix(alg_matrix);
+    display_draw_matrix(alg_matrix, font_file);
     initialize_cursor(alg_matrix);
+
+    int temp_stress = -1;
 
     while (keep_running) // algorithm loop
     {
@@ -95,9 +97,15 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         databuffer_pop(db_in, val);
         pthread_mutex_unlock(mutex_in_buffer);
 
-        last_stress = stress;
+        temp_stress = get_stress_level(val[0], val[1]); // this is the case if crying provided value(count > 0), but stress > 50 so it is invalid; wait for heartbeat data
+        if (temp_stress == -1)
+        {
+            continue;
+        }
 
-        stress = get_stress_level(val[0], val[1]); // TODO handle stress -1
+        last_stress = stress;
+        stress = temp_stress;
+
         curr_tile->stress = stress;
         fprintf(stdout, "r:%li c:%li heartbeat:%i crying:%i stress: %i\n", curr_tile->location[0], curr_tile->location[1], val[0], val[1], stress);
 

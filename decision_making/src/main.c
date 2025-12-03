@@ -16,11 +16,11 @@
 #define UART_TX IO_AR3
 #define UART_RX IO_AR4
 
-#define MSEC_IN_READ_SLEEP_DURATION 20
+#define MSEC_IN_READ_SLEEP_DURATION 100
 
-#define PROCESSOR_SLEEP_DURATION 200
+#define PROCESSOR_SLEEP_DURATION 201
 
-#define FONT_PATH "/home/student/ryb/fonts/ILGH16XB.FNT"
+const char* FONT_PATH = "/home/student/ryb/fonts/ILGH16XB.FNT";
 
 int max_stress = 100;
 
@@ -71,22 +71,13 @@ int main()
     FontxFile fx16G[2];
     InitFontx(fx16G, FONT_PATH, "");
 
-    stylistics *styling = malloc(sizeof(stylistics));
-    styling->line_width = 5;
-    styling->x_inner_offset = 50;
-    styling->x_outer_offset = 20;
-    styling->y_inner_offset = 50;
-    styling->y_outer_offset = 20;
-    styling->fx = fx16G;
-
     data_process_args *processor_args = malloc(sizeof(data_process_args));
     processor_args->db_in = databuffer_in;
     processor_args->db_out = databuffer_out;
     processor_args->mutex_in_buffer = &buffer_in_mutex;
     processor_args->mutex_out_buffer = &buffer_out_mutex;
     processor_args->msec_sleep = PROCESSOR_SLEEP_DURATION;
-    processor_args->styling = styling;
-    processor_args->display = &display;
+    processor_args->font_file = fx16G;
 
     pthread_t processor;
     pthread_create(&processor, NULL, call_data_process_fromargs, processor_args);
@@ -112,7 +103,8 @@ int main()
 
     displayFillScreen(&display, RGB_WHITE);
     fprintf(stdout, "Closed display\n");
-
+    
+    display_destroy(&display);
     pynq_destroy();
 
     free(reader_in_args);
