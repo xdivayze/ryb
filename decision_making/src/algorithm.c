@@ -110,7 +110,7 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
                     return top_tile; // return first higher score tile
                 }
                 if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
-                {
+                { 
                     *relativity = 1;
                     alt_tile = top_tile;
                     highest_score = 1;
@@ -211,14 +211,14 @@ tile *determine_next_tile(tile *curr_tile, int *relativity) // relativity set by
 
                     return bottom_tile; // return first higher score tile
                 }
-                if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
-                {
-                    *relativity = 3;
+                // if (tile_data == 1 && highest_score < 1) // if same score tile is found update the alt tile if only 0s or -1s are found so far
+                // { //! this condition is causing it to favor bottom tile if bottom is a 1 and only -1s are found. the last 1 index isnt able to assign a -1 to the tile...
+                //     *relativity = 3;
 
-                    alt_tile = bottom_tile;
-                    highest_score = 1;
-                    break;
-                }
+                //     alt_tile = bottom_tile;
+                //     highest_score = 1;
+                //     break;
+                // }
                 if (tile_data == -1 && (!alt_tile || highest_score == 1))
                 {
                     *relativity = 3;

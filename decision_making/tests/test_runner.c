@@ -31,16 +31,16 @@ int main(void)
     // RUN_TEST(test_heartbeat_from_stress);
     // RUN_TEST(test_crying_from_stress);
     // RUN_TEST(test_baby_mock_check_bare_values);
-    // RUN_TEST(test_tile_detection);
+    RUN_TEST(test_tile_detection);
 
     //pynq dependent tests
 
     // RUN_TEST(test_read_data);
 
-    RUN_TEST(test_processor);
+    // RUN_TEST(test_processor);
 
     
-    RUN_TEST(test_tile_detection_with_display);
+    // RUN_TEST(test_tile_detection_with_display);
 
     return UNITY_END();
 }
