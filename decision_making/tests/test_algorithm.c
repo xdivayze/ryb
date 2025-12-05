@@ -69,10 +69,11 @@ void test_tile_detection(void)
     struct timespec ts;
     ts.tv_nsec = 50 * 1000 * 1000;
     ts.tv_sec = 50 / 1000;
-
+    int dstress = 0;
     while (keep_running)
     {
-        if (current_stress > last_stress)
+        dstress = last_stress - current_stress;
+        if (dstress > 1 || dstress < 0)
         {
             printf("panic jump\n");
             curr_tile = initial_tile; // panic jump
@@ -135,10 +136,11 @@ void test_tile_detection_with_display(void)
     InitFontx(fx16G, FONT_PATH, "");
     display_draw_matrix(alg_matrix, fx16G);
     initialize_cursor(alg_matrix);
-
+    int dstress = 0;
     while (keep_running)
     {
-        if (current_stress > last_stress)
+        dstress = last_stress - current_stress;
+        if (dstress > 1 || dstress < 0)
         {
             printf("panic jump\n");
             last_tile = curr_tile;
