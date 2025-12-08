@@ -3,7 +3,6 @@
 
 #include <libpynq.h>
 #include <stdint.h>
-#include <data_buffer.h>
 #include <pthread.h>
 
 typedef struct
@@ -17,7 +16,7 @@ typedef struct
 typedef struct
 {
     int uart_index;
-    DataBuffer *db_reader;
+    uint8_t *db_reader;
     pthread_mutex_t *mutex_reader;
 } reader_args;
 

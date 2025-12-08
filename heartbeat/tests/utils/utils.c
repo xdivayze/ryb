@@ -1,11 +1,11 @@
 #include "utils.h"
 #include <libpynq.h>
 
-static volatile int keep_running = 1;
+static volatile int keep_processor_running = 1;
 
 void stop_i2c_writer(void)
 {
-    keep_running = 0;
+    keep_processor_running = 0;
 }
 
 static volatile int keep_uart_reader_running = 1;
@@ -25,7 +25,7 @@ void *i2c_writer(void *args)
     iic_reset(casted_args->IIC_INDEX);
 
     iic_set_slave_mode(casted_args->IIC_INDEX, casted_args->IIC_ADDR, (uint32_t *)regs, sizeof(regs) / sizeof(regs[0]));
-    while (keep_running)
+    while (keep_processor_running)
     {
         iic_slave_mode_handler(casted_args->IIC_INDEX);
         regs[0] = casted_args->data_to_send; // only up to 4 bytes for testing purposes
