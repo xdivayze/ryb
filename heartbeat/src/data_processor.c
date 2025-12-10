@@ -90,7 +90,7 @@ int input_buffering(adc_channel_t adc_channel, pthread_mutex_t *mutex_out_proces
         pthread_mutex_unlock(mutex_out_processor_buffer);
         pthread_mutex_unlock(mutex_out_displayer_buffer);
 
-        pthread_cond_signal(input_cv);
+        pthread_cond_broadcast(input_cv);
 
         baseline = current_voltage * alpha + baseline * (1.0f - alpha);
         nanosleep(&ts, NULL);

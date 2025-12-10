@@ -1,29 +1,19 @@
 #ifndef UTILS_H
 #define UTILS_H
-
-#include <libpynq.h>
-#include <stdint.h>
 #include <pthread.h>
-
 typedef struct
 {
-    iic_index_t IIC_INDEX;
-    uint8_t IIC_ADDR;
-    uint32_t data_to_send;
-    uint8_t register_to_write;
-} writer_args;
+    int *bpm;
+    int frequency;
+    float spike_voltage;
+    float *db;
+    pthread_cond_t *cv;
+    pthread_mutex_t *mutex;
+    pthread_mutex_t *bpm_mutex;
+} pulsegenerator_args;
 
-typedef struct
-{
-    int uart_index;
-    uint8_t *db_reader;
-    pthread_mutex_t *mutex_reader;
-} reader_args;
+double get_time_ms(void);
 
-void stop_i2c_writer(void);
-void stop_uart_reader(void);
-
-void *i2c_writer(void *args);
-void *uart_reader(void *args);
-
+void pulse_generator(int *bpm, int frequency, float spike_voltage, float *db,
+                     pthread_cond_t *cv, pthread_mutex_t *mutex, pthread_mutex_t *bpm_mutex);
 #endif

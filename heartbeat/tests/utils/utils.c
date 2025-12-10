@@ -1,57 +1,45 @@
 #include "utils.h"
 #include <libpynq.h>
+#include <pthread.h>
+#include <time.h>
+#include <math.h>
 
-static volatile int keep_processor_running = 1;
-
-void stop_i2c_writer(void)
+double get_time_ms(void)
 {
-    keep_processor_running = 0;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    return (double)ts.tv_sec * 1000.0 +
+           (double)ts.tv_nsec / 1e6;
 }
 
-static volatile int keep_uart_reader_running = 1;
+static volatile int keep_pulse_generator_running = 1;
 
-void stop_uart_reader(void)
+void pulse_generator(int *bpm, int frequency, float spike_voltage, float *db, pthread_cond_t *cv, pthread_mutex_t *mutex, pthread_mutex_t *bpm_mutex)
 {
-    keep_uart_reader_running = 0;
-}
+    struct timespec ts;
+    ts.tv_nsec = (1.0f / frequency) * 1e9;
+    ts.tv_sec = (1.0f / frequency);
 
-void *i2c_writer(void *args)
-{
+    pthread_mutex_lock(bpm_mutex);
+    int pulse_frequency_discrete = ceilf(frequency / ((*bpm) / 60.0f));
+    pthread_mutex_unlock(bpm_mutex);
 
-    uint32_t volatile regs[32] = {0};
+    int n = 1;
 
-    writer_args *casted_args = (writer_args *)args;
-    iic_init(casted_args->IIC_INDEX);
-    iic_reset(casted_args->IIC_INDEX);
-
-    iic_set_slave_mode(casted_args->IIC_INDEX, casted_args->IIC_ADDR, (uint32_t *)regs, sizeof(regs) / sizeof(regs[0]));
-    while (keep_processor_running)
+    while (keep_pulse_generator_running)
     {
-        iic_slave_mode_handler(casted_args->IIC_INDEX);
-        regs[0] = casted_args->data_to_send; // only up to 4 bytes for testing purposes
-        sleep_msec(10);
+        pthread_mutex_lock(bpm_mutex);
+        pulse_frequency_discrete = floorf(frequency / ((*bpm) / 60.0f));
+        pthread_mutex_unlock(bpm_mutex);
+
+        pthread_mutex_lock(mutex);
+        *db = (n % pulse_frequency_discrete == 0) ? spike_voltage : 0;
+        pthread_mutex_unlock(mutex);
+        pthread_cond_broadcast(cv);
+
+        n++;
+
+        nanosleep(&ts, NULL);
     }
-}
-
-void *uart_reader(void *args)
-{
-    reader_args *casted_args = (reader_args *)args;
-
-    uart_init(casted_args->uart_index);
-    uart_reset_fifos(casted_args->uart_index);
-
-    uint8_t *vals = malloc(sizeof(uint8_t) * casted_args->db_reader->array_len);
-    while (keep_uart_reader_running)
-    {
-        if (casted_args->db_reader->count == casted_args->db_reader->buffer_capacity) {
-            stop_uart_reader();
-        }
-
-        for (int i = 0; i < casted_args->db_reader->array_len; i++)
-        {
-            vals[i] = uart_recv(casted_args->uart_index);
-        }
-    }
-
-    free(vals);
 }

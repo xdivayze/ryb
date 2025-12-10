@@ -4,13 +4,14 @@
 
 #define ADC_CHANNEL ADC2
 
+display_t display;
+
 int main()
 {
     pynq_init();
 
     adc_init();
     
-    data_process(NULL, NULL, NULL, NULL, 50, NULL, ADC_CHANNEL);
     
     pynq_destroy();
 
