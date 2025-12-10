@@ -14,7 +14,12 @@ double get_time_ms(void)
 }
 
 static volatile int keep_pulse_generator_running = 1;
-
+void *call_pulse_generator(void *void_args)
+{
+    pulsegenerator_args *args = void_args;
+    pulse_generator(args->bpm, args->frequency, args->spike_voltage, args->db, args->cv, args->mutex, args->bpm_mutex);
+    return NULL;
+}
 void pulse_generator(int *bpm, int frequency, float spike_voltage, float *db, pthread_cond_t *cv, pthread_mutex_t *mutex, pthread_mutex_t *bpm_mutex)
 {
     struct timespec ts;
@@ -22,7 +27,7 @@ void pulse_generator(int *bpm, int frequency, float spike_voltage, float *db, pt
     ts.tv_sec = (1.0f / frequency);
 
     pthread_mutex_lock(bpm_mutex);
-    int pulse_frequency_discrete = ceilf(frequency / ((*bpm) / 60.0f));
+    int pulse_frequency_discrete = floorf(frequency / ((*bpm) / 60.0f));
     pthread_mutex_unlock(bpm_mutex);
 
     int n = 1;

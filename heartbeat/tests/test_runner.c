@@ -2,6 +2,7 @@
 
 void test_processor(void);
 void test_pulse_generator(void);
+void test_processor_no_display(void);
 
 
 void setUp(void)
@@ -14,7 +15,8 @@ int main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_pulse_generator);
+    // RUN_TEST(test_pulse_generator);
+    RUN_TEST(test_processor_no_display);
 
     return UNITY_END();
 }

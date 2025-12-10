@@ -4,12 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void *call_pulse_generator(void *void_args)
-{
-    pulsegenerator_args *args = void_args;
-    pulse_generator(args->bpm, args->frequency, args->spike_voltage, args->db, args->cv, args->mutex, args->bpm_mutex);
-    return NULL;
-}
+
 
 void test_pulse_generator(void)
 {
@@ -93,7 +88,7 @@ void test_pulse_generator(void)
         curr_bpm = ceilf(60.0f / ((curr_time - last_time) / 1000.0f));
         if (abs(curr_bpm - bpm) < 10)
         {
-            TEST_ASSERT_TRUE_MESSAGE(1, "heartbeat frequency not within error range");
+            TEST_ASSERT_TRUE_MESSAGE(1, "updated heartbeat frequency not within error range");
             break;
         }
     }
