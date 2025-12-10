@@ -23,7 +23,7 @@ typedef struct
     pthread_cond_t *output_cv;
 } processor_args;
 
-void *call_data_process_fromargs(void *args);
+void *call_data_process_fromargs(void *void_args);
 
 void initialize_processor(float adc_reference_voltage, float difference_thresh, size_t heartbeat_sampling_frequency,
                           size_t heartbeat_ema_cutoff_sample_n, size_t buffering_ema_tau);

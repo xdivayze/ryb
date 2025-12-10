@@ -16,6 +16,14 @@ static double get_time_ms(void)
 
 static volatile int keep_display_loop_running = 1;
 
+void *call_display_loop_fromargs(void *void_args)
+{
+    display_loop_args *args = void_args;
+    start_display_loop(args->db_in, args->graph_timeframe_msec, args->cv, args->buffer_mutex);
+
+    return NULL;
+}
+
 int start_display_loop(float *db_in, size_t graph_timeframe_msec, pthread_cond_t *cv, pthread_mutex_t *buffer_mutex)
 {
 
