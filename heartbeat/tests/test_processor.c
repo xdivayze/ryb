@@ -42,7 +42,6 @@ void test_processor_with_display(void)
 
     pthread_create(&generator_thread, NULL, call_pulse_generator, &pg_args);
 
-
     pthread_t display_thread;
 
     display_loop_args d_args = {
@@ -57,10 +56,6 @@ void test_processor_with_display(void)
     pthread_join(display_thread, NULL);
 
     pynq_destroy();
-
-
-
-    
 }
 
 void test_processor_no_display(void)

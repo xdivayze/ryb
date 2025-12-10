@@ -2,7 +2,7 @@
 #include <time.h>
 #include <pthread.h>
 #include "data_processor.h"
-
+#include <math.h>
 #define GRAPH_OFFSET_FROM_MIDDLE 100
 
 static double get_time_ms(void)
@@ -30,9 +30,11 @@ int start_display_loop(float *db_in, size_t graph_timeframe_msec, pthread_cond_t
     if (graph_timeframe_msec % DISPLAY_WIDTH)
     {
         fprintf(stderr, "provided graph timeframe is not divisible by display width\n");
-        return -1;
+        // return -1;
     }
-    size_t sample_per_pixel = graph_timeframe_msec / DISPLAY_WIDTH;
+    size_t sample_per_pixel = ceilf((float) graph_timeframe_msec * heartbeat_sampling_frequency / (1000.0f * DISPLAY_WIDTH));
+
+    printf("sample per pixel: %i\n", sample_per_pixel);
 
     size_t current_sample_n = 0;
 
