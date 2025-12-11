@@ -5,8 +5,7 @@
 #include <display_ops.h>
 
 #define ADC_CHANNEL ADC2
-
-const int spike_voltage = 1.0f;
+float spike_voltage = 0.9f;
 
 display_t display;
 
@@ -17,7 +16,7 @@ int main()
     adc_init();
     display_init(&display);
 
-    initialize_processor(3.3f, spike_voltage - 0.2f, 200, 4, 3);
+    initialize_processor(3.3f, spike_voltage, 200, 4, 3);
 
     pthread_mutex_t mutex_db_display;
     pthread_mutex_init(&mutex_db_display, NULL);

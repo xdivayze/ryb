@@ -55,7 +55,7 @@ void test_processor_with_display(void)
 
     pthread_join(display_thread, NULL);
 
-    pynq_destroy();
+    pynq_destroy(); 
 }
 
 void test_processor_no_display(void)

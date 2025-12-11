@@ -14,7 +14,7 @@
 #define OUT_AMPL_TEXT "OUT2"
 
 float adc_reference_voltage = 3.3f;
-static float difference_thresh = 0.5f;
+static float difference_thresh = 0.9f;
 size_t heartbeat_sampling_frequency = 200;
 static size_t heartbeat_ema_cutoff_sample_n = 4;
 static size_t buffering_ema_tau = 3;
@@ -103,7 +103,7 @@ int input_buffering(adc_channel_t adc_channel, pthread_mutex_t *mutex_out_proces
         db_out_processor[0] = current_voltage - baseline;
         db_out_displayer[0] = current_voltage - baseline;
 
-        printf("voltage spike at:%i\n", current_voltage-baseline);
+        // printf("voltage spike at:%.2f\n", current_voltage-baseline);
 
         pthread_mutex_unlock(mutex_out_processor_buffer);
         pthread_mutex_unlock(mutex_out_displayer_buffer);
@@ -145,7 +145,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
         current_voltage = db_in[0];
         pthread_mutex_unlock(mutex_in_buffer);
 
-        if (current_voltage > difference_thresh && !isUp)
+        if ((current_voltage > difference_thresh) && !isUp)
         {
             isUp = 1;
             last_rise_ms = current_rise_ms;
@@ -153,7 +153,13 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
             last_instantaneous_bpm = instantaneous_bpm;
             instantaneous_bpm = 60.0f / ((current_rise_ms - last_rise_ms) / 1000.0f);
             ema_bpm = ((1.0f - ema_bpm_alpha) * ema_bpm) + (ema_bpm_alpha * instantaneous_bpm);
-            heartbeat_ready_counter++;
+            
+            if (instantaneous_bpm < 250) {
+                ema_bpm = ((1.0f - ema_bpm_alpha) * ema_bpm) + (ema_bpm_alpha * instantaneous_bpm);
+                heartbeat_ready_counter++;
+                heartbeat_ready_counter++;
+                printf("voltage: %.6f, bpm: %.6f\n", current_voltage, instantaneous_bpm);
+            }
         }
         else
         {
