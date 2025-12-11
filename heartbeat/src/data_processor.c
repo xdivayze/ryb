@@ -39,6 +39,14 @@ void stop_input_buffering(void)
     keep_input_buffering_running = 0;
 }
 
+void *call_input_buffering_fromargs(void *void_args)
+{
+    input_buffering_args *args = void_args;
+    input_buffering(args->adc_channel, args->mutex_out_processor_buffer, args->mutex_out_displayer_buffer,
+                    args->db_out_processor, args->db_out_displayer, args->warmup_count, args->input_cv);
+    return NULL;
+}
+
 void *call_data_process_fromargs(void *void_args)
 {
     processor_args *args = void_args;
@@ -95,6 +103,8 @@ int input_buffering(adc_channel_t adc_channel, pthread_mutex_t *mutex_out_proces
         db_out_processor[0] = current_voltage - baseline;
         db_out_displayer[0] = current_voltage - baseline;
 
+        printf("voltage spike at:%i\n", current_voltage-baseline);
+
         pthread_mutex_unlock(mutex_out_processor_buffer);
         pthread_mutex_unlock(mutex_out_displayer_buffer);
 
@@ -141,7 +151,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
             last_rise_ms = current_rise_ms;
             current_rise_ms = get_time_ms();
             last_instantaneous_bpm = instantaneous_bpm;
-            instantaneous_bpm = 60.0f / ( (current_rise_ms - last_rise_ms) / 1000.0f);
+            instantaneous_bpm = 60.0f / ((current_rise_ms - last_rise_ms) / 1000.0f);
             ema_bpm = ((1.0f - ema_bpm_alpha) * ema_bpm) + (ema_bpm_alpha * instantaneous_bpm);
             heartbeat_ready_counter++;
         }

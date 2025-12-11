@@ -25,6 +25,17 @@ typedef struct
 
 void *call_data_process_fromargs(void *void_args);
 
+typedef struct
+{
+    adc_channel_t adc_channel;
+    pthread_mutex_t *mutex_out_processor_buffer;
+    pthread_mutex_t *mutex_out_displayer_buffer;
+    float *db_out_processor;
+    float *db_out_displayer;
+    size_t warmup_count;
+    pthread_cond_t *input_cv;
+} input_buffering_args;
+void* call_input_buffering_fromargs(void* void_args);
 void initialize_processor(float adc_reference_voltage, float difference_thresh, size_t heartbeat_sampling_frequency,
                           size_t heartbeat_ema_cutoff_sample_n, size_t buffering_ema_tau);
 
