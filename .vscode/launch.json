@@ -5,7 +5,7 @@
       "name": "(gdb) Launch Test Bin",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/heartbeat/bin/tests/run_tests",
+      "program": "${workspaceFolder}/crying/bin/tests/run_tests",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",

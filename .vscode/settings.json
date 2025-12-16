@@ -4,6 +4,6 @@
         "data_buffer.h": "c",
         "data_processor.h": "c"
     },
-    "makefile.makefilePath": "${workspaceFolder}/decision_making/Makefile",
+    "makefile.makefilePath": "${workspaceFolder}/crying/Makefile",
     "C_Cpp.errorSquiggles": "enabled"
 }
