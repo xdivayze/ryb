@@ -16,11 +16,10 @@
 #define OUT_AMPL_TEXT "OUT2"
 
 float adc_reference_voltage = 3.3f;
-static float difference_thresh = 0.9f;
-size_t heartbeat_sampling_frequency = 200;
-static size_t heartbeat_ema_cutoff_sample_n = 4;
+static float process_thresh = 0.1f;
+size_t crying_sampling_frequency = 200;
+static size_t crying_ema_cutoff_sample_n = 4;
 static size_t buffering_ema_tau = 3;
-static size_t inst_bpm_difference_for_reset_thresh = (240 - 60) / 90 * 10 - 5; //-5 for error margin
 
 static inline float convert_raw_adc_to_voltage(uint32_t adc_raw)
 {
@@ -66,13 +65,13 @@ static double get_time_ms(void)
            (double)ts.tv_nsec / 1e6;
 }
 
-void initialize_processor(float adc_reference_voltage, float difference_thresh, size_t heartbeat_sampling_frequency,
-                          size_t heartbeat_ema_cutoff_sample_n, size_t buffering_ema_tau)
+void initialize_processor(float adc_reference_voltage, float process_thresh, size_t crying_sampling_frequency,
+                          size_t crying_ema_cutoff_sample_n, size_t buffering_ema_tau)
 {
     adc_reference_voltage = adc_reference_voltage;
-    difference_thresh = difference_thresh;
-    heartbeat_sampling_frequency = heartbeat_sampling_frequency;
-    heartbeat_ema_cutoff_sample_n = heartbeat_ema_cutoff_sample_n;
+    process_thresh = process_thresh;
+    crying_sampling_frequency = crying_sampling_frequency;
+    crying_ema_cutoff_sample_n = crying_ema_cutoff_sample_n;
     buffering_ema_tau = buffering_ema_tau;
 }
 
@@ -81,12 +80,12 @@ int input_buffering(adc_channel_t adc_channel, pthread_mutex_t *mutex_out_proces
 {
     uint32_t raw_adc = adc_read_channel_raw(adc_channel);
     float current_voltage = convert_raw_adc_to_voltage(raw_adc);
-    float alpha = 1.0f - expf((-1.0f / heartbeat_sampling_frequency) / buffering_ema_tau);
+    float alpha = 1.0f - expf((-1.0f / crying_sampling_frequency) / buffering_ema_tau);
     float baseline = current_voltage;
 
     struct timespec ts;
-    ts.tv_nsec = (1 / (float)heartbeat_sampling_frequency) * 1000000;
-    ts.tv_sec = (1 / (float)heartbeat_sampling_frequency) / 1000;
+    ts.tv_nsec = (1 / (float)crying_sampling_frequency) * 1000000;
+    ts.tv_sec = (1 / (float)crying_sampling_frequency) / 1000;
 
     for (int i = 0; i < warmup_count; i++)
     {
@@ -121,66 +120,43 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
                  uint8_t *db_out, uint8_t *data_ready, pthread_cond_t *input_cv, pthread_cond_t *output_cv)
 {
 
-    float vdiff = 0;
-    float last_rise_ms = get_time_ms();
-    float current_rise_ms = last_rise_ms;
+    float vmax = 0;
 
-    float current_voltage, last_voltage;
-
-    float ema_bpm_alpha = 1.0f - expf(-1.0f / heartbeat_ema_cutoff_sample_n);
+    float ema_bpm_alpha = 1.0f - expf(-1.0f / crying_ema_cutoff_sample_n);
     float ema_bpm_initial = 240;
 
-    float instantaneous_bpm = ema_bpm_initial;
-    float last_instantaneous_bpm = instantaneous_bpm;
+    float instantaneous_crying = ema_bpm_initial;
+    float last_instantaneous_crying = instantaneous_crying;
 
-    int heartbeat_ready_counter = 0;
+    int crying_ready_counter = 0;
 
-    float ema_bpm = instantaneous_bpm;
+    float ema_crying = instantaneous_crying;
 
-    int isUp = 0;
+    float current_voltage = 0.0f;
+
 
     while (keep_processor_running)
     {
         pthread_mutex_lock(mutex_in_buffer);
         pthread_cond_wait(input_cv, mutex_in_buffer);
-        last_voltage = current_voltage;
         current_voltage = db_in[0];
         pthread_mutex_unlock(mutex_in_buffer);
 
-        if ((current_voltage > difference_thresh) && !isUp)
+        if (current_voltage > process_thresh)
         {
-            isUp = 1;
-            last_rise_ms = current_rise_ms;
-            current_rise_ms = get_time_ms();
-            last_instantaneous_bpm = instantaneous_bpm;
-            instantaneous_bpm = 60.0f / ((current_rise_ms - last_rise_ms) / 1000.0f);
-            ema_bpm = ((1.0f - ema_bpm_alpha) * ema_bpm) + (ema_bpm_alpha * instantaneous_bpm);
-            
-            if (instantaneous_bpm < 250) {
-                ema_bpm = ((1.0f - ema_bpm_alpha) * ema_bpm) + (ema_bpm_alpha * instantaneous_bpm);
-                heartbeat_ready_counter++;
-                heartbeat_ready_counter++;
-                printf("voltage: %.6f, bpm: %.6f\n", current_voltage, instantaneous_bpm);
-            }
-        }
-        else
-        {
-            isUp = 0;
+            last_instantaneous_crying = instantaneous_crying;
+            ema_crying = ((1.0f - ema_bpm_alpha) * ema_crying) + (ema_bpm_alpha * instantaneous_crying);
+            crying_ready_counter++;
         }
 
-        if (abs(instantaneous_bpm - last_instantaneous_bpm) > inst_bpm_difference_for_reset_thresh)
-        {
-            heartbeat_ready_counter = 0;
-        }
-
-        if (heartbeat_ready_counter == heartbeat_ema_cutoff_sample_n - 1)
+        if (crying_ready_counter == crying_ema_cutoff_sample_n - 1)
         {
             pthread_mutex_lock(mutex_out_buffer);
-            db_out[0] = (uint8_t)ema_bpm;
+            db_out[0] = (uint8_t)ema_crying;
             data_ready[0] = 1;
             pthread_mutex_unlock(mutex_out_buffer);
             pthread_cond_broadcast(output_cv);
-            heartbeat_ready_counter = 0;
+            crying_ready_counter = 0;
         }
     }
     return 0;

@@ -32,7 +32,7 @@ int start_display_loop(float *db_in, size_t graph_timeframe_msec, pthread_cond_t
         fprintf(stderr, "provided graph timeframe is not divisible by display width\n");
         // return -1;
     }
-    size_t sample_per_pixel = ceilf((float) graph_timeframe_msec * heartbeat_sampling_frequency / (1000.0f * DISPLAY_WIDTH));
+    size_t sample_per_pixel = ceilf((float)graph_timeframe_msec * crying_sampling_frequency / (1000.0f * DISPLAY_WIDTH));
 
     printf("sample per pixel: %i\n", sample_per_pixel);
 
