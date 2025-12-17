@@ -15,8 +15,8 @@ int main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_pulse_generator);
-    // RUN_TEST(test_processor_no_display);
+    // RUN_TEST(test_pulse_generator);
+    RUN_TEST(test_processor_no_display);
     //RUN_TEST(test_processor_with_display);
 
     return UNITY_END();

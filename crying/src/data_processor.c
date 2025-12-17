@@ -123,7 +123,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
     float vmax = 0;
 
     float ema_bpm_alpha = 1.0f - expf(-1.0f / crying_ema_cutoff_sample_n);
-    float ema_bpm_initial = 240;
+    float ema_bpm_initial = 3.3f;
 
     float instantaneous_crying = ema_bpm_initial;
     float last_instantaneous_crying = instantaneous_crying;
@@ -144,16 +144,18 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         if (current_voltage > process_thresh)
         {
-            vmax = current_voltage;
+            
             last_instantaneous_crying = instantaneous_crying;
+            instantaneous_crying = current_voltage;
             ema_crying = ((1.0f - ema_bpm_alpha) * ema_crying) + (ema_bpm_alpha * instantaneous_crying);
             crying_ready_counter++;
         }
 
         if (crying_ready_counter == crying_ema_cutoff_sample_n - 1)
         {
+            vmax = (ema_crying > vmax) ? ema_crying : vmax;
             pthread_mutex_lock(mutex_out_buffer);
-            db_out[0] = (uint8_t)ema_crying;
+            db_out[0] = (uint8_t)(ema_crying * 100.0f/vmax);
             data_ready[0] = 1;
             pthread_mutex_unlock(mutex_out_buffer);
             pthread_cond_broadcast(output_cv);

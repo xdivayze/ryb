@@ -19,6 +19,9 @@ void test_pulse_generator(void)
     pthread_cond_t pulse_generated;
     pthread_cond_init(&pulse_generated, NULL);
 
+    pthread_mutex_t spike_mutex;
+    pthread_mutex_init(&spike_mutex, NULL);
+
     float spike_voltage = 1.2f;
 
     int sampling_freq = 4000;
@@ -30,7 +33,8 @@ void test_pulse_generator(void)
         .db = &val,
         .frequency = &frequency,
         .mutex = &db_mutex,
-        .spike_voltage = spike_voltage,
+        .spike_voltage = &spike_voltage,
+        .spike_mutex = &spike_mutex,
     };
 
     pthread_t generator_thread;
@@ -68,6 +72,9 @@ void test_pulse_generator(void)
     pthread_mutex_lock(&frequency_mutex);
     frequency = 100;
     pthread_mutex_unlock(&frequency_mutex);
+    pthread_mutex_lock(&spike_mutex);
+    spike_voltage = 4.0f;
+    pthread_mutex_unlock(&spike_mutex);
 
     while (1)
     {
@@ -90,6 +97,7 @@ void test_pulse_generator(void)
 
         if (fabs(curr_freq - frequency) < 20)
         {
+            TEST_ASSERT_EQUAL_FLOAT_MESSAGE(spike_voltage, val, "spike voltage value not equal to actual spike");
             TEST_ASSERT_TRUE_MESSAGE(1, "updated heartbeat frequency not within error range");
             break;
         }
