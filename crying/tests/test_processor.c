@@ -16,7 +16,7 @@ void test_processor_with_display(void)
     displayFillScreen(&display, RGB_WHITE);
 
      pthread_mutex_t frequency_mutex;
-    int frequency = 500;
+    int frequency = 10;
     pthread_mutex_init(&frequency_mutex, NULL);
 
     pthread_mutex_t db_mutex;
@@ -52,7 +52,7 @@ void test_processor_with_display(void)
         .buffer_mutex = &db_mutex,
         .cv = &pulse_generated,
         .db_in = &val,
-        .graph_timeframe_msec = 2400,
+        .graph_timeframe_msec = 1200,
     };
 
     pthread_create(&display_thread, NULL, call_display_loop_fromargs, &d_args);
