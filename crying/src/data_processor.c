@@ -144,6 +144,7 @@ int data_process(pthread_mutex_t *mutex_in_buffer, pthread_mutex_t *mutex_out_bu
 
         if (current_voltage > process_thresh)
         {
+            vmax = current_voltage;
             last_instantaneous_crying = instantaneous_crying;
             ema_crying = ((1.0f - ema_bpm_alpha) * ema_crying) + (ema_bpm_alpha * instantaneous_crying);
             crying_ready_counter++;

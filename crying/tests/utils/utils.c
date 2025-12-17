@@ -17,29 +17,28 @@ static volatile int keep_pulse_generator_running = 1;
 void *call_pulse_generator(void *void_args)
 {
     pulsegenerator_args *args = void_args;
-    pulse_generator(args->bpm, args->frequency, args->spike_voltage, args->db, args->cv, args->mutex, args->bpm_mutex);
+    pulse_generator(args->sampling_freq, args->frequency, args->spike_voltage, args->db, args->cv, args->mutex, args->frequency_mutex);
     return NULL;
 }
-void pulse_generator(int *bpm, int frequency, float spike_voltage, float *db, pthread_cond_t *cv, pthread_mutex_t *mutex, pthread_mutex_t *bpm_mutex)
+void pulse_generator(int sampling_freq, int *frequency, float spike_voltage, float *db, pthread_cond_t *cv, pthread_mutex_t *mutex, pthread_mutex_t *frequency_mutex)
 {
     struct timespec ts;
-    ts.tv_nsec = (1.0f / frequency) * 1e9;
-    ts.tv_sec = (1.0f / frequency);
+    ts.tv_nsec = (1.0f / sampling_freq) * 1e9;
+    ts.tv_sec = (1.0f / sampling_freq);
+    pthread_mutex_lock(frequency_mutex);
+    float pulse_frequency_discrete = 2 * M_PI * ((float)(*frequency) / sampling_freq);
+    pthread_mutex_unlock(frequency_mutex);
 
-    pthread_mutex_lock(bpm_mutex);
-    int pulse_frequency_discrete = floorf(frequency / ((*bpm) / 60.0f));
-    pthread_mutex_unlock(bpm_mutex);
-
-    int n = 1;
+    int n = 0;
 
     while (keep_pulse_generator_running)
     {
-        pthread_mutex_lock(bpm_mutex);
-        pulse_frequency_discrete = floorf(frequency / ((*bpm) / 60.0f));
-        pthread_mutex_unlock(bpm_mutex);
+        pthread_mutex_lock(frequency_mutex);
+        pulse_frequency_discrete = 2 * M_PI * ((float)(*frequency) / sampling_freq);
+        pthread_mutex_unlock(frequency_mutex);
 
         pthread_mutex_lock(mutex);
-        *db = (n % pulse_frequency_discrete == 0) ? spike_voltage : 0;
+        *db = spike_voltage * sinf(pulse_frequency_discrete * n);
         pthread_mutex_unlock(mutex);
         pthread_cond_broadcast(cv);
 

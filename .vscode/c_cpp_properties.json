@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/crying/include",
+                "${workspaceFolder}/crying/tests/utils"
             ],
             "defines": [],
             "compilerPath": "/usr/sbin/gcc",
